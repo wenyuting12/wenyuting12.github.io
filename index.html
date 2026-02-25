@@ -1,0 +1,4858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>婚礼邀请函</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f8f8f8;
+            min-height: 100vh;
+        }
+
+        .preview-page {
+            min-height: 100vh;
+            background: #f8f8f8;
+            position: relative;
+            width: 100%;
+        }
+
+        /* ===== 头部样式 ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 88px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 100;
+            background-color: white;
+        }
+
+        .garden-header {
+            background: linear-gradient(to bottom, rgba(248, 225, 230, 0.9), rgba(248, 225, 230, 0.3), transparent);
+        }
+
+        .modern-header {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.5), transparent);
+        }
+
+        .chinese-header {
+            background: linear-gradient(to bottom, rgba(200, 30, 30, 0.95), rgba(180, 40, 40, 0.6), transparent);
+        }
+
+        .island-header {
+            background: linear-gradient(to bottom, rgba(2, 132, 199, 0.9), rgba(2, 132, 199, 0.3), transparent);
+        }
+
+        .back-btn {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .back-icon {
+            width: 36px;
+            height: 36px;
+            filter: brightness(0) invert(1);
+        }
+
+        .back-icon.dark-icon {
+            filter: brightness(0.3);
+        }
+
+        .back-icon.chinese-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            background-color: rgba(255,255,255,0.9);
+            padding: 8px 30px;
+            border-radius: 40px;
+        }
+
+        .header-title.dark-title {
+            color: #333;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .header-title.chinese-title {
+            color: #ffd700;
+            background: rgba(180, 40, 40, 0.6);
+            font-family: "STKaiti", "KaiTi", serif;
+        }
+
+        .placeholder {
+            width: 60px;
+        }
+
+        /* ===== 音乐控制按钮 ===== */
+        .music-control {
+            position: fixed;
+            top: 110px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        .music-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .music-icon.playing {
+            animation: musicWave 1.5s ease-in-out infinite;
+        }
+
+        .music-note {
+            font-size: 40px;
+            color: #333;
+            line-height: 1;
+        }
+
+        @keyframes musicWave {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; color: #FF69B4; }
+        }
+
+        .hidden-audio {
+            display: none;
+        }
+
+        .music-toast {
+            position: fixed;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 26px;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .content {
+            margin-top: 88px;
+            height: calc(100vh - 88px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== 温柔花园样式 ===== */
+        .garden-invitation {
+            background: linear-gradient(145deg, #fae9e7, #f5ded9);
+            min-height: 100%;
+        }
+
+        .garden-invitation .cover-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #fae9e7, #f5ded9);
+            position: relative;
+        }
+
+        .garden-invitation .cover-content {
+            text-align: center;
+            color: white;
+        }
+
+        .garden-invitation .invite-label {
+            font-size: 20px;
+            letter-spacing: 8px;
+            margin-bottom: 60px;
+            display: block;
+        }
+
+        .garden-invitation .couple-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .garden-invitation .name {
+            font-size: 70px;
+            font-weight: 400;
+            color: white;
+        }
+
+        .garden-invitation .and {
+            font-size: 38px;
+        }
+
+        .garden-invitation .wedding-date {
+            font-size: 30px;
+            margin-bottom: 50px;
+            display: block;
+        }
+
+        .garden-invitation .flower-decoration {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .garden-invitation .flower {
+            font-size: 28px;
+        }
+
+        .garden-invitation .scroll-hint {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .garden-invitation .arrow {
+            font-size: 40px;
+            animation: gentleBounce 2s infinite;
+        }
+
+        @keyframes gentleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        .garden-invitation .section-wrapper {
+            padding: 80px 30px;
+            border-bottom: 1px solid rgba(255, 201, 206, 0.2);
+        }
+
+        .garden-invitation .section-inner {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .garden-invitation .image-left {
+            flex-direction: row;
+        }
+
+        .garden-invitation .image-right {
+            flex-direction: row-reverse;
+        }
+
+        .garden-invitation .image-top {
+            flex-direction: column;
+        }
+
+        .garden-invitation .image-bottom {
+            flex-direction: column-reverse;
+        }
+
+        .garden-invitation .image-container {
+            flex: 1.2;
+            overflow: hidden;
+            width: 450px;
+            height: 450px;
+        }
+
+        .garden-invitation .image-container.square-normal {
+            border-radius: 10px;
+            width: 480px;
+            height: 480px;
+        }
+
+        .garden-invitation .image-container.soft-circle {
+            border-radius: 45% 55% 50% 50% / 50% 45% 55% 50%;
+            width: 450px;
+            height: 450px;
+        }
+
+        .garden-invitation .image-container.soft-round {
+            border-radius: 35% 65% 45% 55% / 55% 40% 60% 45%;
+            width: 450px;
+            height: 450px;
+        }
+
+        .garden-invitation .image-container.soft-heart {
+            border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%;
+            width: 550px;
+            height: 550px;
+        }
+
+        .garden-invitation .image-container.soft-arch {
+            border-radius: 50% 50% 30% 70% / 60% 40% 60% 40%;
+            width: 450px;
+            height: 450px;
+        }
+
+        .garden-invitation .section-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .garden-invitation .text-container {
+            flex: 0.8;
+        }
+
+        .garden-invitation .text-container.full {
+            width: 100%;
+            text-align: center;
+        }
+
+        .garden-invitation .decorative-tag {
+            font-size: 24px;
+            color: #e9a4a4;
+            letter-spacing: 6px;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .garden-invitation .poetic-line {
+            font-size: 32px;
+            color: #7a5e5e;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .garden-invitation .poetic-line.highlight {
+            color: #e9a4a4;
+            font-size: 34px;
+        }
+
+        .garden-invitation .quote-lines {
+            margin: 30px 0;
+        }
+
+        .garden-invitation .quote-line {
+            font-size: 22px;
+            color: #a78f8f;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .garden-invitation .poem-lines {
+            margin: 35px 0;
+        }
+
+        .garden-invitation .poem-line {
+            font-size: 22px;
+            color: #a78f8f;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .garden-invitation .soft-quotes {
+            margin: 35px 0;
+        }
+
+        .garden-invitation .soft-quote {
+            font-size: 22px;
+            color: #b59999;
+            display: block;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .garden-invitation .love-letters {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .garden-invitation .soft-letter {
+            font-size: 70px;
+            color: #e9a4a4;
+        }
+
+        .garden-invitation .soft-countdown {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+        }
+
+        .garden-invitation .countdown-piece {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .garden-invitation .piece-number {
+            font-size: 36px;
+            color: #e9a4a4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .garden-invitation .piece-label {
+            font-size: 18px;
+            color: #b59999;
+        }
+
+        .garden-invitation .welcome-lines {
+            margin: 30px 0;
+        }
+
+        .garden-invitation .welcome-line {
+            font-size: 22px;
+            color: #a78f8f;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .garden-invitation .welcome-badge text {
+            font-size: 18px;
+            color: #e9a4a4;
+            border-bottom: 1px solid rgba(233, 164, 164, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .garden-invitation .date-big {
+            font-size: 66px;
+            color: #e9a4a4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .garden-invitation .date-small {
+            font-size: 20px;
+            color: #b59999;
+        }
+
+        .garden-invitation .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .garden-invitation .cal-weekday {
+            font-size: 18px;
+            color: #b59999;
+            text-align: center;
+        }
+
+        .garden-invitation .cal-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .garden-invitation .cal-date {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8b7474;
+            border-radius: 50%;
+        }
+
+        .garden-invitation .cal-date.wedding-day {
+            background: rgba(233, 164, 164, 0.15);
+            color: #e9a4a4;
+        }
+
+        .garden-invitation .place-name {
+            font-size: 28px;
+            color: #7a5e5e;
+            display: block;
+            margin-bottom: 18px;
+        }
+
+        .garden-invitation .place-tags {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .garden-invitation .place-tag {
+            font-size: 18px;
+            color: #b59999;
+            background: rgba(233, 164, 164, 0.08);
+            padding: 8px 22px;
+            border-radius: 30px;
+        }
+
+        .garden-invitation .nav-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 248, 245, 0.8);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .garden-invitation .nav-card-left {
+            flex: 1;
+        }
+
+        .garden-invitation .nav-card-title {
+            font-size: 24px;
+            color: #e9a4a4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .garden-invitation .nav-card-address {
+            font-size: 20px;
+            color: #b59999;
+        }
+
+        .garden-invitation .nav-card-icon {
+            font-size: 28px;
+            color: #e9a4a4;
+        }
+
+        .garden-invitation .nav-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(233, 164, 164, 0.08);
+            border-radius: 40px;
+            padding: 15px 30px;
+            margin-top: 25px;
+            cursor: pointer;
+        }
+
+        .garden-invitation .nav-button.small {
+            padding: 12px 25px;
+        }
+
+        .garden-invitation .nav-icon {
+            font-size: 28px;
+        }
+
+        .garden-invitation .nav-text {
+            font-size: 22px;
+            color: #e9a4a4;
+        }
+
+        .garden-invitation .detail-banner {
+            margin-bottom: 25px;
+        }
+
+        .garden-invitation .detail-day {
+            font-size: 32px;
+            color: #e9a4a4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .garden-invitation .detail-week {
+            font-size: 20px;
+            color: #b59999;
+        }
+
+        .garden-invitation .info-pair {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .garden-invitation .info-label {
+            font-size: 22px;
+            color: #b59999;
+            width: 120px;
+        }
+
+        .garden-invitation .info-value {
+            font-size: 22px;
+            color: #7a5e5e;
+            flex: 1;
+        }
+
+        .garden-invitation .gentle-words {
+            margin-top: 30px;
+        }
+
+        .garden-invitation .gentle-word {
+            font-size: 22px;
+            color: #a78f8f;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .garden-invitation .form-center {
+            justify-content: center;
+        }
+
+        .garden-invitation .form-card {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 248, 245, 0.9);
+            border-radius: 20px;
+            padding: 50px 40px;
+        }
+
+        .garden-invitation .form-head {
+            font-size: 32px;
+            color: #e9a4a4;
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .garden-invitation .field {
+            margin-bottom: 35px;
+        }
+
+        .garden-invitation .field-label {
+            font-size: 22px;
+            color: #7a5e5e;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .garden-invitation .field-input {
+            width: 100%;
+            height: 75px;
+            background: rgba(255, 248, 245, 0.8);
+            border-radius: 45px;
+            padding: 0 30px;
+            font-size: 22px;
+            color: #7a5e5e;
+            border: 1px solid rgba(233, 164, 164, 0.15);
+            outline: none;
+        }
+
+        .garden-invitation .guest-picker {
+            display: flex;
+            align-items: center;
+            height: 75px;
+            background: rgba(255, 248, 245, 0.8);
+            border-radius: 45px;
+            border: 1px solid rgba(233, 164, 164, 0.15);
+        }
+
+        .garden-invitation .picker-btn {
+            width: 80px;
+            text-align: center;
+            font-size: 30px;
+            color: #e9a4a4;
+            cursor: pointer;
+        }
+
+        .garden-invitation .picker-number {
+            flex: 1;
+            text-align: center;
+            font-size: 26px;
+            color: #7a5e5e;
+        }
+
+        .garden-invitation .send-btn {
+            width: 100%;
+            height: 75px;
+            background: linear-gradient(135deg, #f5d0d0, #f0c0c0);
+            color: white;
+            border-radius: 45px;
+            font-size: 24px;
+            line-height: 75px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .garden-invitation .gift-message {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(233, 164, 164, 0.1);
+        }
+
+        .garden-invitation .gift-title {
+            font-size: 26px;
+            color: #e9a4a4;
+            text-align: center;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .garden-invitation .gift-note {
+            font-size: 18px;
+            color: #b59999;
+            text-align: center;
+            display: block;
+        }
+
+        .garden-invitation .footer-section {
+            padding: 60px 30px 80px;
+            text-align: center;
+        }
+
+        .garden-invitation .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .garden-invitation .footer-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .garden-invitation .action-emoji {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .garden-invitation .action-name {
+            font-size: 20px;
+            color: #b59999;
+        }
+
+        .garden-invitation .footer-stats {
+            margin-bottom: 20px;
+        }
+
+        .garden-invitation .stat-number {
+            font-size: 28px;
+            color: #e9a4a4;
+            margin-right: 12px;
+        }
+
+        .garden-invitation .stat-label {
+            font-size: 20px;
+            color: #b59999;
+        }
+
+        .garden-invitation .footer-info {
+            margin-bottom: 40px;
+        }
+
+        .garden-invitation .info-text {
+            font-size: 20px;
+            color: #c9aeae;
+        }
+
+        /* ===== 简约现代样式 ===== */
+        .modern-invitation {
+            background: #ffffff;
+            color: #1a1a1a;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            min-height: 100%;
+        }
+
+        .modern-invitation .cover-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .modern-invitation .cover-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 0 40px;
+        }
+
+        .modern-invitation .invite-label {
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 60px;
+            display: block;
+            font-weight: 300;
+        }
+
+        .modern-invitation .couple-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .modern-invitation .name {
+            font-size: 48px;
+            font-weight: 300;
+            color: #000;
+            letter-spacing: 2px;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .and {
+            font-size: 28px;
+            color: #ccc;
+            font-weight: 200;
+        }
+
+        .modern-invitation .date-location {
+            margin-bottom: 50px;
+        }
+
+        .modern-invitation .wedding-date {
+            font-size: 20px;
+            font-weight: 400;
+            color: #333;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .wedding-time {
+            font-size: 16px;
+            color: #999;
+            display: block;
+        }
+
+        .modern-invitation .minimal-line {
+            width: 40px;
+            height: 1px;
+            background: #000;
+            margin: 40px auto;
+        }
+
+        .modern-invitation .short-quote {
+            font-size: 18px;
+            color: #666;
+            font-style: italic;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .scroll-indicator {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .modern-invitation .scroll-text {
+            font-size: 12px;
+            color: #999;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .scroll-arrow {
+            font-size: 24px;
+            color: #999;
+            animation: gentleBounce 2s infinite;
+        }
+
+        .modern-invitation .story-section {
+            padding: 120px 40px;
+            background: #fafafa;
+        }
+
+        .modern-invitation .story-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modern-invitation .story-year {
+            font-size: 14px;
+            color: #999;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .modern-invitation .story-title {
+            font-size: 32px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            margin-bottom: 30px;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .story-line {
+            width: 40px;
+            height: 1px;
+            background: #000;
+            margin: 30px auto;
+        }
+
+        .modern-invitation .story-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 60px;
+            display: block;
+            text-align: left;
+        }
+
+        .modern-invitation .story-numbers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 60px;
+        }
+
+        .modern-invitation .number-item {
+            text-align: center;
+        }
+
+        .modern-invitation .number {
+            font-size: 32px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .number-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modern-invitation .section-wrapper {
+            padding: 100px 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modern-invitation .section-inner {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .modern-invitation .image-left {
+            flex-direction: row;
+        }
+
+        .modern-invitation .image-right {
+            flex-direction: row-reverse;
+        }
+
+        .modern-invitation .image-container.square-gallery {
+            width: 320px;
+            height: 320px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .modern-invitation .image-rounded {
+            border-radius: 30px;
+        }
+
+        .modern-invitation .image-circle {
+            border-radius: 50%;
+        }
+
+        .modern-invitation .section-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modern-invitation .modern-text {
+            flex: 1;
+        }
+
+        .modern-invitation .section-number {
+            font-size: 14px;
+            color: #ccc;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .modern-invitation .poetic-line-large {
+            font-size: 28px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            margin-bottom: 15px;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .poetic-line-sub {
+            font-size: 16px;
+            color: #666;
+            display: block;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .modern-invitation .quote-block {
+            margin-top: 40px;
+            padding-left: 20px;
+            border-left: 2px solid #000;
+        }
+
+        .modern-invitation .quote-modern {
+            font-size: 16px;
+            color: #333;
+            font-style: italic;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .quote-author {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modern-invitation .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .modern-invitation .detail-item {
+            text-align: left;
+        }
+
+        .modern-invitation .detail-icon {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .detail-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .modern-invitation .text-center {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .modern-invitation .section-title-large {
+            font-size: 28px;
+            font-weight: 300;
+            color: #000;
+            margin-top: 15px;
+            display: block;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .collage-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modern-invitation .collage-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-invitation .collage-item.large {
+            width: 100%;
+            height: 400px;
+            border-radius: 40px;
+        }
+
+        .modern-invitation .collage-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .modern-invitation .collage-item.medium {
+            flex: 1;
+            height: 300px;
+        }
+
+        .modern-invitation .collage-item.small {
+            flex: 1;
+            height: 200px;
+        }
+
+        .modern-invitation .collage-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modern-invitation .collage-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+            padding: 30px;
+            color: white;
+        }
+
+        .modern-invitation .collage-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .modern-invitation .vows-section {
+            padding: 120px 40px;
+            background: #000;
+            color: white;
+            text-align: center;
+        }
+
+        .modern-invitation .vows-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modern-invitation .vows-label {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #999;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .modern-invitation .vows-line {
+            width: 40px;
+            height: 1px;
+            background: #fff;
+            margin: 30px auto;
+        }
+
+        .modern-invitation .vows-text {
+            font-size: 16px;
+            color: #fff;
+            line-height: 2;
+            display: block;
+            font-weight: 300;
+        }
+
+        .modern-invitation .vows-signature {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .modern-invitation .signature-name {
+            font-size: 18px;
+            font-family: "Didot", "Georgia", serif;
+            color: #fff;
+        }
+
+        .modern-invitation .signature-and {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .modern-invitation .countdown-modern {
+            text-align: center;
+        }
+
+        .modern-invitation .countdown-label {
+            font-size: 14px;
+            color: #999;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 40px;
+        }
+
+        .modern-invitation .countdown-cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .modern-invitation .countdown-card {
+            width: 120px;
+            padding: 25px 0;
+            background: #f8f8f8;
+            text-align: center;
+        }
+
+        .modern-invitation .card-number {
+            font-size: 32px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .card-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modern-invitation .invitation-card {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 60px 40px;
+            background: #fafafa;
+        }
+
+        .modern-invitation .invitation-title {
+            font-size: 28px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            margin-bottom: 30px;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .invitation-line {
+            width: 40px;
+            height: 1px;
+            background: #000;
+            margin: 30px auto;
+        }
+
+        .modern-invitation .invitation-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            display: block;
+            text-align: left;
+        }
+
+        .modern-invitation .invitation-details {
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .modern-invitation .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modern-invitation .detail-icon-modern {
+            width: 50px;
+            font-size: 18px;
+            color: #999;
+        }
+
+        .modern-invitation .detail-text-modern {
+            font-size: 14px;
+            color: #666;
+            flex: 1;
+        }
+
+        .modern-invitation .map-card {
+            background: #f8f8f8;
+            padding: 40px;
+        }
+
+        .modern-invitation .map-info {
+            margin-bottom: 30px;
+        }
+
+        .modern-invitation .map-title {
+            font-size: 22px;
+            font-weight: 400;
+            color: #000;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modern-invitation .map-address {
+            font-size: 14px;
+            color: #666;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .modern-invitation .map-tags {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .modern-invitation .map-tag {
+            font-size: 12px;
+            color: #999;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+        }
+
+        .modern-invitation .nav-button-modern {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #000;
+            color: white;
+            padding: 25px;
+            cursor: pointer;
+        }
+
+        .modern-invitation .rsvp-modern {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modern-invitation .rsvp-title {
+            font-size: 24px;
+            font-weight: 300;
+            color: #000;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: "Didot", "Georgia", serif;
+        }
+
+        .modern-invitation .rsvp-subtitle {
+            font-size: 12px;
+            color: #999;
+            display: block;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .modern-invitation .form-modern {
+            background: #fafafa;
+            padding: 40px;
+        }
+
+        .modern-invitation .form-group {
+            margin-bottom: 40px;
+        }
+
+        .modern-invitation .form-label {
+            font-size: 12px;
+            color: #999;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .modern-invitation .form-input-modern {
+            width: 100%;
+            height: 80px;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            background: transparent;
+            font-size: 16px;
+            color: #333;
+            padding: 0;
+            outline: none;
+        }
+
+        .modern-invitation .guest-selector-modern {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            height: 80px;
+        }
+
+        .modern-invitation .selector-btn-modern {
+            width: 80px;
+            font-size: 24px;
+            color: #999;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .modern-invitation .selector-number-modern {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .modern-invitation .diet-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .modern-invitation .diet-option {
+            padding: 15px 30px;
+            background: white;
+            border: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .modern-invitation .diet-option.selected {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        .modern-invitation .form-textarea {
+            width: 100%;
+            height: 160px;
+            border: 1px solid #eee;
+            background: white;
+            padding: 20px;
+            font-size: 14px;
+            color: #333;
+            resize: none;
+            outline: none;
+        }
+
+        .modern-invitation .submit-btn-modern {
+            width: 100%;
+            height: 88px;
+            background: #000;
+            color: white;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modern-invitation .gift-modern {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .modern-invitation .gift-icon-section {
+            width: 120px;
+            height: 120px;
+            background: #f8f8f8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+
+        .modern-invitation .gift-icon {
+            font-size: 40px;
+        }
+
+        .modern-invitation .gift-title-modern {
+            font-size: 20px;
+            font-weight: 400;
+            color: #000;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .modern-invitation .gift-text-modern {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .modern-invitation .gift-qr-placeholder {
+            padding: 40px;
+            background: #f8f8f8;
+            border: 1px dashed #ddd;
+        }
+
+        .modern-invitation .footer-modern {
+            padding: 60px 30px 80px;
+            background: #fafafa;
+            text-align: center;
+        }
+
+        .modern-invitation .footer-actions-modern {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .modern-invitation .footer-action-modern {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .modern-invitation .action-emoji-modern {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .modern-invitation .action-text-modern {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modern-invitation .footer-stats-modern {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .modern-invitation .footer-copyright {
+            font-size: 10px;
+            color: #ccc;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 中式传统样式 ===== */
+        .chinese-invitation {
+            background: #fff5f0;
+            color: #4a2c2c;
+            font-family: "STKaiti", "KaiTi", "华文楷体", serif;
+            min-height: 100%;
+        }
+
+        .chinese-invitation .cover-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #b82828, #8b1a1a);
+            overflow: hidden;
+        }
+
+        .chinese-invitation .cover-pattern-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.2) 0px, rgba(255, 215, 0, 0.2) 10px, transparent 10px, transparent 20px);
+        }
+
+        .chinese-invitation .cover-pattern-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: repeating-linear-gradient(-45deg, rgba(255, 215, 0, 0.2) 0px, rgba(255, 215, 0, 0.2) 10px, transparent 10px, transparent 20px);
+        }
+
+        .chinese-invitation .cover-content {
+            text-align: center;
+            color: white;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chinese-invitation .chinese-char {
+            font-size: 120px;
+            color: #ffd700;
+            display: block;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .chinese-invitation .invite-label {
+            font-size: 28px;
+            letter-spacing: 8px;
+            color: #ffd700;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .chinese-invitation .couple-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chinese-invitation .name {
+            font-size: 56px;
+            color: #fff;
+            font-weight: 400;
+            letter-spacing: 4px;
+        }
+
+        .chinese-invitation .and {
+            font-size: 40px;
+            color: #ffd700;
+        }
+
+        .chinese-invitation .wedding-date {
+            font-size: 32px;
+            color: #ffd966;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .chinese-invitation .wedding-date-en {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.9);
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .chinese-invitation .double-happiness {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .chinese-invitation .double {
+            font-size: 50px;
+            color: #ffd700;
+        }
+
+        .chinese-invitation .scroll-hint {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .chinese-invitation .chinese-section {
+            background: #fff;
+            border: 2px solid #b82828;
+            margin: 30px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(180, 40, 40, 0.1);
+        }
+
+        .chinese-invitation .section-title-wrapper {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .chinese-invitation .chinese-section-title {
+            font-size: 36px;
+            color: #b82828;
+            letter-spacing: 8px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .chinese-invitation .title-decoration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .chinese-invitation .decoration-left,
+        .chinese-invitation .decoration-right {
+            font-size: 24px;
+            color: #b82828;
+        }
+
+        .chinese-invitation .decoration-center {
+            font-size: 28px;
+            color: #b82828;
+            font-weight: 500;
+        }
+
+        .chinese-invitation .couple-intro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .chinese-invitation .intro-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .chinese-invitation .intro-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .chinese-invitation .intro-name {
+            font-size: 36px;
+            color: #4a2c2c;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .chinese-invitation .intro-desc {
+            font-size: 24px;
+            color: #b82828;
+        }
+
+        .chinese-invitation .intro-middle {
+            width: 120px;
+            text-align: center;
+        }
+
+        .chinese-invitation .middle-char {
+            font-size: 70px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-family: "SimSun", "宋体", "STSong", "华文宋体", sans-serif;
+        }
+
+        .chinese-invitation .middle-text {
+            font-size: 24px;
+            color: #4a2c2c;
+        }
+
+        .chinese-invitation .red-section {
+            background: linear-gradient(145deg, #b82828, #8b1a1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chinese-invitation .gold-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.1) 0px, rgba(255, 215, 0, 0.1) 20px, transparent 20px, transparent 40px);
+            pointer-events: none;
+        }
+
+        .chinese-invitation .wedding-info {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+        }
+
+        .chinese-invitation .info-title {
+            font-size: 48px;
+            color: #ffd700;
+            display: block;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 12px;
+        }
+
+        .chinese-invitation .info-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chinese-invitation .info-icon {
+            width: 60px;
+            font-size: 36px;
+            color: #ffd700;
+        }
+
+        .chinese-invitation .info-text {
+            font-size: 28px;
+            color: #fff;
+            flex: 1;
+        }
+
+        .chinese-invitation .divider-chinese {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 40px 0;
+        }
+
+        .chinese-invitation .traditional-quote {
+            font-size: 26px;
+            color: #ffd700;
+            text-align: center;
+            display: block;
+            font-style: italic;
+        }
+
+        .chinese-invitation .timeline-chinese {
+            padding: 20px 0;
+        }
+
+        .chinese-invitation .timeline-item-chinese {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .chinese-invitation .time-badge {
+            width: 140px;
+            padding: 15px 0;
+            background: #b82828;
+            color: #ffd700;
+            font-size: 28px;
+            text-align: center;
+            border-radius: 40px;
+            margin-right: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chinese-invitation .event-content {
+            flex: 1;
+        }
+
+        .chinese-invitation .event-name {
+            font-size: 36px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .chinese-invitation .event-desc {
+            font-size: 24px;
+            color: #4a2c2c;
+        }
+
+        .chinese-invitation .decoration-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px;
+            background: #fff5f0;
+        }
+
+        .chinese-invitation .cloud-pattern {
+            flex: 1;
+            height: 40px;
+            background: repeating-linear-gradient(90deg, #b82828 0px, #b82828 10px, transparent 10px, transparent 20px);
+        }
+
+        .chinese-invitation .cloud-pattern.reverse {
+            transform: scaleX(-1);
+        }
+
+        .chinese-invitation .chinese-knot {
+            width: 120px;
+            height: 120px;
+            background: #b82828;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 30px;
+        }
+
+        .chinese-invitation .knot-char {
+            font-size: 60px;
+            color: #ffd700;
+        }
+
+        .chinese-invitation .chinese-gallery {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chinese-invitation .gallery-frame {
+            flex: 1;
+            position: relative;
+            border: 4px solid #b82828;
+            padding: 15px;
+            background: white;
+        }
+
+        .chinese-invitation .gallery-frame.left {
+            transform: rotate(-2deg);
+        }
+
+        .chinese-invitation .gallery-frame.center {
+            transform: translateY(-20px);
+            border-color: #ffd700;
+        }
+
+        .chinese-invitation .gallery-frame.right {
+            transform: rotate(2deg);
+        }
+
+        .chinese-invitation .gallery-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .chinese-invitation .frame-decoration {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #b82828;
+            color: #ffd700;
+            padding: 5px 20px;
+            font-size: 24px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+
+        .chinese-invitation .red-section-light {
+            background: #fff0e6;
+            border: 2px solid #b82828;
+            margin: 30px;
+            padding: 40px 30px;
+            border-radius: 20px;
+        }
+
+        .chinese-invitation .blessing-card {
+            text-align: center;
+        }
+
+        .chinese-invitation .blessing-title {
+            font-size: 40px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 40px;
+            letter-spacing: 6px;
+        }
+
+        .chinese-invitation .blessing-content {
+            margin-bottom: 40px;
+        }
+
+        .chinese-invitation .blessing-line {
+            font-size: 28px;
+            color: #4a2c2c;
+            display: block;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .chinese-invitation .blessing-signature {
+            font-size: 28px;
+            color: #b82828;
+            text-align: right;
+        }
+
+        .chinese-invitation .map-card-chinese {
+            background: #fff;
+            border: 2px solid #b82828;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .chinese-invitation .map-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .chinese-invitation .map-title-chinese {
+            font-size: 40px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .chinese-invitation .map-subtitle {
+            font-size: 28px;
+            color: #4a2c2c;
+        }
+
+        .chinese-invitation .map-address-chinese {
+            font-size: 28px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .chinese-invitation .map-tags-chinese {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .chinese-invitation .map-tag-chinese {
+            font-size: 24px;
+            color: #b82828;
+            background: #fff0e6;
+            padding: 10px 30px;
+            border-radius: 40px;
+        }
+
+        .chinese-invitation .nav-button-chinese {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #b82828;
+            color: white;
+            padding: 25px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        .chinese-invitation .rsvp-chinese {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chinese-invitation .rsvp-title-chinese {
+            font-size: 40px;
+            color: #b82828;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 8px;
+        }
+
+        .chinese-invitation .rsvp-subtitle-chinese {
+            font-size: 24px;
+            color: #666;
+            display: block;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .chinese-invitation .form-chinese {
+            background: #fff;
+            border: 2px solid #b82828;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .chinese-invitation .form-group-chinese {
+            margin-bottom: 40px;
+        }
+
+        .chinese-invitation .form-label-chinese {
+            font-size: 28px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .chinese-invitation .form-input-chinese {
+            width: 100%;
+            height: 80px;
+            border: none;
+            border-bottom: 2px solid #b82828;
+            background: transparent;
+            font-size: 28px;
+            color: #333;
+            padding: 0;
+            outline: none;
+        }
+
+        .chinese-invitation .guest-selector-chinese {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #b82828;
+            height: 80px;
+        }
+
+        .chinese-invitation .selector-btn-chinese {
+            width: 80px;
+            font-size: 40px;
+            color: #b82828;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .chinese-invitation .selector-number-chinese {
+            flex: 1;
+            text-align: center;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .chinese-invitation .diet-options-chinese {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chinese-invitation .diet-option-chinese {
+            padding: 15px 30px;
+            background: #fff0e6;
+            border: 1px solid #b82828;
+            font-size: 24px;
+            color: #b82828;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        .chinese-invitation .form-textarea-chinese {
+            width: 100%;
+            height: 160px;
+            border: 2px solid #b82828;
+            background: white;
+            padding: 20px;
+            font-size: 26px;
+            color: #333;
+            border-radius: 20px;
+            resize: none;
+            outline: none;
+        }
+
+        .chinese-invitation .submit-btn-chinese {
+            width: 100%;
+            height: 88px;
+            background: #b82828;
+            color: #ffd700;
+            font-size: 32px;
+            letter-spacing: 8px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        .chinese-invitation .gift-chinese {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .chinese-invitation .red-envelope {
+            width: 200px;
+            height: 200px;
+            background: #b82828;
+            border-radius: 30px 30px 60px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(180, 40, 40, 0.3);
+        }
+
+        .chinese-invitation .red-envelope::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 10px;
+        }
+
+        .chinese-invitation .envelope-char {
+            font-size: 70px;
+            color: #ffd700;
+            margin-top: 30px;
+            font-weight: bold;
+            font-family: "SimSun", "宋体", "STSong", "华文宋体", sans-serif;
+        }
+
+        .chinese-invitation .envelope-text {
+            font-size: 28px;
+            color: #ffd700;
+        }
+
+        .chinese-invitation .gift-title-chinese {
+            font-size: 32px;
+            color: #b82828;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .chinese-invitation .gift-text-chinese {
+            font-size: 26px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .chinese-invitation .gift-qr-chinese {
+            padding: 40px;
+            background: #fff0e6;
+            border: 2px dashed #b82828;
+            border-radius: 20px;
+        }
+
+        .chinese-invitation .qr-text {
+            font-size: 28px;
+            color: #b82828;
+        }
+
+        .chinese-invitation .footer-chinese {
+            padding: 60px 30px 80px;
+            background: #fff0e6;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chinese-invitation .footer-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: repeating-linear-gradient(90deg, #b82828 0px, #b82828 20px, transparent 20px, transparent 40px);
+        }
+
+        .chinese-invitation .footer-actions-chinese {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chinese-invitation .footer-action-chinese {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chinese-invitation .action-emoji-chinese {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .chinese-invitation .action-text-chinese {
+            font-size: 24px;
+            color: #b82828;
+        }
+
+        .chinese-invitation .footer-stats-chinese {
+            font-size: 26px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .chinese-invitation .footer-copyright-chinese {
+            font-size: 22px;
+            color: #999;
+        }
+
+        /* ===== 海岛度假样式 ===== */
+        .island-invitation {
+            background: linear-gradient(145deg, #e0f2fe, #b8e2f2);
+            color: #0a4d68;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            position: relative;
+            min-height: 100%;
+        }
+
+        .island-invitation .cover-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #48b5d0, #1e7ca5);
+            overflow: hidden;
+        }
+
+        .island-invitation .cover-wave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: repeating-linear-gradient(transparent 0px, transparent 20px, rgba(255, 255, 255, 0.3) 20px, rgba(255, 255, 255, 0.3) 40px);
+            opacity: 0.3;
+        }
+
+        .island-invitation .wave-top {
+            top: 0;
+            transform: rotate(180deg);
+        }
+
+        .island-invitation .wave-bottom {
+            bottom: 0;
+        }
+
+        .island-invitation .cover-content {
+            text-align: center;
+            color: white;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .island-invitation .invite-label {
+            font-size: 32px;
+            letter-spacing: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            display: block;
+            font-weight: 300;
+        }
+
+        .island-invitation .couple-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .island-invitation .name {
+            font-size: 64px;
+            color: white;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .island-invitation .and {
+            font-size: 48px;
+            color: #ffd966;
+        }
+
+        .island-invitation .wedding-date {
+            font-size: 36px;
+            color: white;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .island-invitation .wedding-location {
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.9);
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .island-invitation .palm-tree {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .island-invitation .palm {
+            font-size: 56px;
+            opacity: 0.8;
+            animation: sway 3s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        .island-invitation .palm:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .island-invitation .palm:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .island-invitation .scroll-hint {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .island-invitation .ocean-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 60px 60px 30px 30px;
+            margin: 40px 30px;
+            padding: 50px 30px;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 80, 100, 0.2);
+        }
+
+        .island-invitation .card-decoration {
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            right: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .island-invitation .shell {
+            font-size: 60px;
+            transform: rotate(-15deg);
+        }
+
+        .island-invitation .starfish {
+            font-size: 60px;
+            transform: rotate(15deg);
+        }
+
+        .island-invitation .story-content {
+            text-align: center;
+        }
+
+        .island-invitation .story-subtitle {
+            font-size: 28px;
+            color: #0a7e9c;
+            display: block;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .island-invitation .story-title {
+            font-size: 48px;
+            color: #055c78;
+            display: block;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .island-invitation .story-line {
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0a7e9c, transparent);
+            margin: 30px auto;
+        }
+
+        .island-invitation .story-text {
+            font-size: 30px;
+            color: #0a4d68;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            display: block;
+            text-align: center;
+        }
+
+        .island-invitation .story-tag {
+            background: rgba(10, 126, 156, 0.1);
+            padding: 20px;
+            border-radius: 50px;
+        }
+
+        .island-invitation .story-tag text {
+            font-size: 24px;
+            color: #0a7e9c;
+        }
+
+        .island-invitation .vow-section {
+            background: #f0faff;
+            margin: 30px;
+            padding: 80px 30px;
+            border-radius: 40px;
+            text-align: center;
+        }
+
+        .island-invitation .vow-quote {
+            font-size: 120px;
+            color: #48b5d0;
+            font-family: serif;
+            line-height: 0.8;
+            display: block;
+            opacity: 0.3;
+        }
+
+        .island-invitation .vow-quote.close {
+            margin-top: 20px;
+        }
+
+        .island-invitation .vow-text {
+            font-size: 40px;
+            color: #055c78;
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .island-invitation .vow-signature {
+            margin-top: 40px;
+            font-size: 26px;
+            color: #0a7e9c;
+            font-style: italic;
+        }
+
+        .island-invitation .section-header-island {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .island-invitation .section-title-island {
+            font-size: 36px;
+            color: #055c78;
+            letter-spacing: 6px;
+        }
+
+        .island-invitation .photo-wall {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .island-invitation .photo-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .island-invitation .photo-item {
+            flex: 1;
+            position: relative;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .island-invitation .photo-wave {
+            border-radius: 60px 20px 60px 20px;
+        }
+
+        .island-invitation .photo-shell {
+            border-radius: 20px 60px 20px 60px;
+        }
+
+        .island-invitation .photo-star {
+            border-radius: 50% 20px 50% 20px;
+        }
+
+        .island-invitation .photo-coral {
+            border-radius: 20px 50% 20px 50%;
+        }
+
+        .island-invitation .photo-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .island-invitation .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+            color: white;
+            padding: 15px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .island-invitation .bottle-card {
+            background: #fef9e7;
+            border-radius: 100px 100px 30px 30px;
+            margin: 40px 30px;
+            padding: 40px;
+            position: relative;
+            border: 4px dashed #ffd966;
+        }
+
+        .island-invitation .bottle-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .island-invitation .bottle-title {
+            font-size: 36px;
+            color: #d97706;
+            display: block;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .island-invitation .info-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .island-invitation .info-icon {
+            width: 60px;
+            font-size: 36px;
+            color: #f59e0b;
+        }
+
+        .island-invitation .info-text {
+            font-size: 28px;
+            color: #92400e;
+            flex: 1;
+        }
+
+        .island-invitation .bottle-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+            margin: 40px 0;
+        }
+
+        .island-invitation .bottle-note {
+            font-size: 26px;
+            color: #b45309;
+            text-align: center;
+            display: block;
+            font-style: italic;
+        }
+
+        .island-invitation .bottle-decoration {
+            position: absolute;
+            bottom: -30px;
+            right: -20px;
+            font-size: 120px;
+            opacity: 0.2;
+            transform: rotate(15deg);
+        }
+
+        .island-invitation .tide-section {
+            background: #e6f7ff;
+            margin: 30px;
+            padding: 40px;
+            border-radius: 40px;
+            border: 2px solid #48b5d0;
+        }
+
+        .island-invitation .tide-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .island-invitation .tide-title {
+            font-size: 40px;
+            color: #0369a1;
+            letter-spacing: 4px;
+        }
+
+        .island-invitation .timeline-tide {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .island-invitation .tide-item {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .island-invitation .tide-time {
+            width: 140px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #0284c7;
+            padding-top: 5px;
+        }
+
+        .island-invitation .tide-content {
+            flex: 1;
+        }
+
+        .island-invitation .tide-event {
+            font-size: 32px;
+            color: #0369a1;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .island-invitation .tide-desc {
+            font-size: 24px;
+            color: #38bdf8;
+        }
+
+        .island-invitation .map-island {
+            background: #f0f9ff;
+            margin: 30px;
+            padding: 40px;
+            border-radius: 60px;
+            border: 2px solid #7dd3fc;
+        }
+
+        .island-invitation .map-header-island {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .island-invitation .map-title-island {
+            font-size: 36px;
+            color: #0369a1;
+            font-weight: 500;
+        }
+
+        .island-invitation .map-content {
+            text-align: center;
+        }
+
+        .island-invitation .map-address-island {
+            font-size: 28px;
+            color: #0284c7;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .island-invitation .map-tags-island {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .island-invitation .map-tag-island {
+            font-size: 24px;
+            color: #0369a1;
+            background: #b8e2f2;
+            padding: 12px 30px;
+            border-radius: 50px;
+        }
+
+        .island-invitation .nav-button-island {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #0284c7;
+            color: white;
+            padding: 25px;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+
+        .island-invitation .nav-text-island {
+            font-size: 28px;
+        }
+
+        .island-invitation .rsvp-island {
+            background: #fef9e7;
+            margin: 30px;
+            padding: 40px;
+            border-radius: 60px;
+        }
+
+        .island-invitation .rsvp-header-island {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .island-invitation .rsvp-title-island {
+            font-size: 40px;
+            color: #b45309;
+            display: block;
+            margin-bottom: 15px;
+            letter-spacing: 4px;
+        }
+
+        .island-invitation .rsvp-subtitle-island {
+            font-size: 26px;
+            color: #d97706;
+        }
+
+        .island-invitation .form-island {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .island-invitation .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .island-invitation .form-label-island {
+            font-size: 28px;
+            color: #92400e;
+            margin-left: 10px;
+        }
+
+        .island-invitation .form-input-island {
+            width: 100%;
+            height: 80px;
+            border: none;
+            border-bottom: 2px solid #fbbf24;
+            background: transparent;
+            font-size: 28px;
+            color: #b45309;
+            padding: 0;
+            outline: none;
+        }
+
+        .island-invitation .guest-selector-island {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #fbbf24;
+            height: 80px;
+        }
+
+        .island-invitation .selector-btn-island {
+            width: 80px;
+            font-size: 40px;
+            color: #f59e0b;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .island-invitation .selector-number-island {
+            flex: 1;
+            text-align: center;
+            font-size: 32px;
+            color: #92400e;
+        }
+
+        .island-invitation .stay-options,
+        .island-invitation .food-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .island-invitation .stay-option,
+        .island-invitation .food-option {
+            padding: 15px 30px;
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            font-size: 26px;
+            color: #b45309;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        .island-invitation .stay-option.selected,
+        .island-invitation .food-option.selected {
+            background: #fbbf24;
+            color: #92400e;
+        }
+
+        .island-invitation .form-textarea-island {
+            width: 100%;
+            height: 160px;
+            border: 2px solid #fbbf24;
+            background: #fef3c7;
+            padding: 20px;
+            font-size: 26px;
+            color: #92400e;
+            border-radius: 30px;
+            resize: none;
+            outline: none;
+        }
+
+        .island-invitation .submit-btn-island {
+            width: 100%;
+            height: 88px;
+            background: #f59e0b;
+            color: white;
+            font-size: 32px;
+            letter-spacing: 4px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+
+        .island-invitation .gift-island {
+            background: #e6f7ff;
+            margin: 30px;
+            padding: 40px;
+            border-radius: 120px 120px 40px 40px;
+        }
+
+        .island-invitation .gift-card-island {
+            text-align: center;
+        }
+
+        .island-invitation .shell-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: float 3s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .island-invitation .gift-title-island {
+            font-size: 36px;
+            color: #0369a1;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .island-invitation .gift-text-island {
+            font-size: 28px;
+            color: #0284c7;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .island-invitation .gift-qr-island {
+            padding: 40px;
+            background: #b8e2f2;
+            border: 4px dashed #0284c7;
+            border-radius: 40px;
+        }
+
+        .island-invitation .qr-text-island {
+            font-size: 28px;
+            color: #0369a1;
+        }
+
+        .island-invitation .footer-island {
+            padding: 60px 30px 80px;
+            background: #1e7ca5;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .island-invitation .footer-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: repeating-linear-gradient(transparent 0px, transparent 15px, rgba(255, 255, 255, 0.3) 15px, rgba(255, 255, 255, 0.3) 30px);
+        }
+
+        .island-invitation .footer-actions-island {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .island-invitation .footer-action-island {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .island-invitation .action-emoji-island {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .island-invitation .action-text-island {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .island-invitation .footer-stats-island {
+            font-size: 26px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .island-invitation .footer-copyright-island {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 照片预览（共用） */
+        .preview-photos {
+            padding: 30px;
+            background: #f5f5f5;
+        }
+
+        .photos-title {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .photos-scroll {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .photos-list {
+            display: flex;
+            gap: 20px;
+        }
+
+        .photo-preview-item {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .photo-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 底部按钮 */
+        .bottom-actions-modern {
+            margin-top: 40px;
+            padding: 0 30px 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-btn-modern {
+            flex: 1;
+            height: 80px;
+            border-radius: 40px;
+            font-size: 28px;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+        }
+
+        .footer-btn-modern.collect {
+            background: rgba(0,0,0,0.05);
+            color: #333;
+        }
+
+        .footer-btn-modern.create {
+            background: #000;
+            color: white;
+        }
+
+        .bottom-actions {
+            padding: 40px 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-btn {
+            flex: 1;
+            height: 80px;
+            border-radius: 40px;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .footer-btn.collect {
+            background: rgba(180,40,40,0.1);
+            color: #b82828;
+        }
+
+        .footer-btn.create {
+            background: linear-gradient(135deg, #b82828, #8b1a1a);
+            color: white;
+        }
+
+        /* 新增样式 - 联系方式 */
+        .info-pair .info-value[style*="e9a4a4"] {
+            font-weight: 500;
+        }
+
+        /* 简约现代模板中邮件字体稍微小一点适配长邮箱 */
+        .modern-invitation .invitation-details .detail-row:nth-child(3) .detail-text-modern {
+            font-size: 22px;
+            word-break: break-all;
+        }
+
+        .detail-row-email .detail-text-modern {
+            font-size: 22px;
+            word-break: break-all;
+        }
+
+        /* 中式模板邮箱样式 */
+        .info-item .info-text[style*="ffd700"] {
+            font-family: "STKaiti", "KaiTi", serif;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 350px) {
+            .header-title {
+                font-size: 24px;
+            }
+
+            .preview-btn,
+            .save-btn {
+                padding: 0 15px;
+                font-size: 24px;
+            }
+        }
+
+        /* 模板选择器 */
+        .template-selector {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="preview-page">
+        <!-- 模板容器 - 根据当前模板ID显示不同内容 -->
+        <div id="template-container"></div>
+
+        <!-- 音乐加载失败提示 -->
+        <div class="music-toast" id="musicToast" style="display: none;">
+            <span id="musicToastText"></span>
+        </div>
+    </div>
+
+    <script>
+        // 从URL获取参数
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            if (queryString) {
+                const pairs = queryString.split('&');
+                pairs.forEach(pair => {
+                    const [key, value] = pair.split('=');
+                    if (key && value) {
+                        params[key] = decodeURIComponent(value);
+                    }
+                });
+            }
+            return params;
+        }
+
+        // 解析URL中的作品数据
+        function parseWorkData() {
+            const params = getUrlParams();
+            
+            // 如果有data参数（包含完整作品数据）
+            if (params.data) {
+                try {
+                    return JSON.parse(params.data);
+                } catch (e) {
+                    console.error('解析作品数据失败:', e);
+                }
+            }
+            
+            // 如果有id参数，可以从localStorage加载
+            if (params.id) {
+                try {
+                    const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
+                    return worksList.find(w => w.id == params.id);
+                } catch (e) {
+                    console.error('从localStorage加载作品失败:', e);
+                }
+            }
+            
+            // 返回默认数据
+            return {
+                templateId: 1,
+                groomName: '子轩',
+                brideName: '雨桐',
+                weddingDate: '2027-09-14',
+                weddingTime: '农历四月廿二 12:00',
+                weddingAddress: '婚贝大酒店A栋9F',
+                declaration: '遇见你，是我最美的意外',
+                declaration2: '我们决定携手共赴爱之新途',
+                quote1: '诚挚邀请最挚爱的亲友',
+                quote2: '来一场关于爱的旅行',
+                quote3: '见证我们爱的启程',
+                poemTitle: '不早不晚',
+                poemLine1: '当我拥你入怀',
+                poemLine2: '我便拥有了一切',
+                poemLine3: '沙子，时间，雨树',
+                poemLine4: '万物生机勃勃',
+                poemLine5: '在你的生命中我看到一切生命',
+                loveDefinition1: '爱，让我和你，变成了我们',
+                loveDefinition2: '让所有的「今天」',
+                loveDefinition3: '变成了「最好的一天」',
+                loveDefinition4: '我们有的是以后',
+                softQuote1: '你不是爱情的终点',
+                softQuote2: '只是爱情的原动力',
+                softQuote3: '我将这爱情献给路旁的花朵',
+                softQuote4: '献给教堂的红色圆顶',
+                softQuote5: '因为你，我爱上了这个世界',
+                countdownText1: '你说最好的人会到身边',
+                countdownText2: '此刻我也这样想',
+                days: '127',
+                hours: '8',
+                minutes: '24',
+                seconds: '36',
+                welcomeTitle: '欢迎',
+                welcomeSubtitle: '我们的婚礼',
+                welcomeLine1: '本着结婚对于我们来说是',
+                welcomeLine2: '开心和重要的事儿',
+                welcomeLine3: '希望各位朋友能够一起见证',
+                welcomeLine4: '这份开心',
+                placeName: '山里·山涧溪谷',
+                placeTag1: '凤凰山',
+                placeTag2: '涵碧楼酒店',
+                navAddress: '凤凰山风景区',
+                gentleWord1: '漫长人生零零碎碎',
+                gentleWord2: '普通又温暖',
+                gentleWord3: '我用最浪漫的方式登场',
+                rsvpTitle: '婚礼回执',
+                namePlaceholder: '请输入您的姓名',
+                defaultGuests: '1',
+                rsvpButton: '发送',
+                giftWord1: '生命中有有的人',
+                giftWord2: '是像礼物一般的存在',
+                giftWord3: '是一想到就觉得',
+                giftWord4: '心底忽而亮堂',
+                giftLine1: '而你，于我而言',
+                giftLine2: '便是这样的存在',
+                giftTitle: '祝福礼物',
+                giftNote1: '礼物金额实时转入',
+                giftNote2: '制作人婚贝账户',
+                actionName1: '祝福留言',
+                actionName2: '烟火贺喜',
+                actionName3: '永结同心',
+                statNumber: '99',
+                statLabel: '祝福留言 · 烟火贺喜 · 永结同心',
+                infoText: '9图 | 20.07w人喜欢'
+            };
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            if (!date) return '';
+            return String(date).replace(/-/g, '.');
+        }
+
+        // 获取年份
+        function getYearFromDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return '';
+            return d.getFullYear();
+        }
+
+        // 获取月份和日期
+        function formatMonthDay(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return '';
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${month}.${day}`;
+        }
+
+        // 获取日期中的日
+        function getDayFromDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return '';
+            return String(d.getDate());
+        }
+
+        // 获取星期几
+        function getWeekday(date) {
+            if (!date) return '';
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            try {
+                const d = new Date(date);
+                if (isNaN(d.getTime())) return '';
+                return weekdays[d.getDay()];
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // 获取模板名称
+        function getTemplateName(templateId) {
+            const names = {
+                1: '温柔花园',
+                2: '简约现代',
+                3: '中式传统',
+                4: '海岛度假'
+            };
+            return names[templateId] || '邀请函';
+        }
+
+        // 生成温柔花园模板HTML
+        function renderGardenTemplate(data) {
+            return `
+                <div class="garden-invitation">
+                    <!-- 封面区 -->
+                    <div class="cover-section">
+                        <div class="cover-content">
+                            <span class="invite-label">INVITATION</span>
+                            <div class="couple-names">
+                                <span class="name">${data.groomName || '子轩'}</span>
+                                <span class="and">·</span>
+                                <span class="name">${data.brideName || '雨桐'}</span>
+                            </div>
+                            <span class="wedding-date">${formatDate(data.weddingDate) || '2027.09.14'}</span>
+                            <div class="flower-decoration">
+                                <span class="flower">✿</span>
+                                <span class="flower">✿</span>
+                                <span class="flower">✿</span>
+                            </div>
+                        </div>
+                        <div class="scroll-hint">
+                            <span>向下滑动</span>
+                            <span class="arrow">⌄</span>
+                        </div>
+                    </div>
+
+                    <!-- 爱情宣言区 -->
+                    ${data.declaration ? `
+                    <div class="section-wrapper">
+                        <div class="section-inner image-left">
+                            <div class="image-container square-normal">
+                                <img src="https://ts3.tc.mm.bing.net/th/id/OIP-C.spKQ7HHQvBO_AGSWEQqfDAHaLH" class="section-image" alt="爱情宣言">
+                            </div>
+                            <div class="text-container">
+                                <span class="decorative-tag">· 满 ·</span>
+                                <span class="poetic-line">${data.declaration}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- 决定携手区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-right">
+                            <div class="text-container">
+                                <span class="decorative-tag">· 小 ·</span>
+                                <span class="poetic-line">${data.declaration2 || '我们决定携手共赴爱之新途'}</span>
+                                <div class="quote-lines">
+                                    <span class="quote-line">${data.quote1 || '诚挚邀请最挚爱的亲友'}</span>
+                                    <span class="quote-line">${data.quote2 || '来一场关于爱的旅行'}</span>
+                                    <span class="quote-line">${data.quote3 || '见证我们爱的启程'}</span>
+                                </div>
+                            </div>
+                            <div class="image-container soft-round">
+                                <img src="https://pic1.zhimg.com/v2-65253473e35dea22770b53eb0567c73c_r.jpg" class="section-image" alt="携手">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 诗歌区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-top">
+                            <div class="image-container soft-heart">
+                                <img src="https://ts4.tc.mm.bing.net/th/id/OIP-C.-VW6HbphYTq8ZF0xECsieAHaLH" class="section-image" alt="诗歌">
+                            </div>
+                            <div class="text-container full">
+                                <span class="decorative-tag">· 美 ·</span>
+                                <span class="poetic-line">${data.poemTitle || '不早不晚'}</span>
+                                <div class="poem-lines">
+                                    <span class="poem-line">${data.poemLine1 || '当我拥你入怀'}</span>
+                                    <span class="poem-line">${data.poemLine2 || '我便拥有了一切'}</span>
+                                    <span class="poem-line">${data.poemLine3 || '沙子，时间，雨树'}</span>
+                                    <span class="poem-line">${data.poemLine4 || '万物生机勃勃'}</span>
+                                    <span class="poem-line">${data.poemLine5 || '在你的生命中我看到一切生命'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 爱的定义区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-left">
+                            <div class="image-container square-normal">
+                                <img src="https://pic1.zhimg.com/v2-4426dae90cbd6e0036e281d1a49bab6f_r.jpg" class="section-image" alt="爱的定义">
+                            </div>
+                            <div class="text-container">
+                                <span class="decorative-tag">· 小 ·</span>
+                                <span class="poetic-line">${data.loveDefinition1 || '爱，让我和你，变成了我们'}</span>
+                                <span class="poetic-line">${data.loveDefinition2 || '让所有的「今天」'}</span>
+                                <span class="poetic-line">${data.loveDefinition3 || '变成了「最好的一天」'}</span>
+                                <div class="quote-lines">
+                                    <span class="quote-line">${data.loveDefinition4 || '我们有的是以后'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LOVE大字区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-bottom">
+                            <div class="text-container full-center">
+                                <div class="love-letters">
+                                    <span class="soft-letter">L</span>
+                                    <span class="soft-letter">O</span>
+                                    <span class="soft-letter">V</span>
+                                    <span class="soft-letter">E</span>
+                                </div>
+                                <div class="soft-quotes">
+                                    <span class="soft-quote">${data.softQuote1 || '你不是爱情的终点'}</span>
+                                    <span class="soft-quote">${data.softQuote2 || '只是爱情的原动力'}</span>
+                                    <span class="soft-quote">${data.softQuote3 || '我将这爱情献给路旁的花朵'}</span>
+                                    <span class="soft-quote">${data.softQuote4 || '献给教堂的红色圆顶'}</span>
+                                </div>
+                                <span class="poetic-line highlight">${data.softQuote5 || '因为你，我爱上了这个世界'}</span>
+                            </div>
+                            <div class="image-container soft-arch">
+                                <img src="https://gd-hbimg.huaban.com/6c579bb4a1d385f25dfc946187dc0094645c7025151a4-ri2X5R_fw658" class="section-image" alt="LOVE">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 倒计时区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-left">
+                            <div class="image-container soft-circle">
+                                <img src="https://ts1.tc.mm.bing.net/th/id/R-C.ac4d7c3f62bb7b016f39fe5c8c0e1b47" class="section-image" alt="倒计时">
+                            </div>
+                            <div class="text-container">
+                                <span class="decorative-tag">· 满 ·</span>
+                                <span class="poetic-line">${data.countdownText1 || '你说最好的人会到身边'}</span>
+                                <span class="poetic-line highlight">${data.countdownText2 || '此刻我也这样想'}</span>
+                                <div class="soft-countdown">
+                                    <div class="countdown-piece">
+                                        <span class="piece-number">${data.days || '127'}</span>
+                                        <span class="piece-label">天</span>
+                                    </div>
+                                    <div class="countdown-piece">
+                                        <span class="piece-number">${data.hours || '8'}</span>
+                                        <span class="piece-label">时</span>
+                                    </div>
+                                    <div class="countdown-piece">
+                                        <span class="piece-number">${data.minutes || '24'}</span>
+                                        <span class="piece-label">分</span>
+                                    </div>
+                                    <div class="countdown-piece">
+                                        <span class="piece-number">${data.seconds || '36'}</span>
+                                        <span class="piece-label">秒</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 欢迎词区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-right">
+                            <div class="text-container">
+                                <span class="decorative-tag">· 美 ·</span>
+                                <span class="poetic-line">${data.welcomeTitle || '欢迎'}</span>
+                                <span class="poetic-line">${data.welcomeSubtitle || '我们的婚礼'}</span>
+                                <div class="welcome-lines">
+                                    <span class="welcome-line">${data.welcomeLine1 || '本着结婚对于我们来说是'}</span>
+                                    <span class="welcome-line">${data.welcomeLine2 || '开心和重要的事儿'}</span>
+                                    <span class="welcome-line">${data.welcomeLine3 || '希望各位朋友能够一起见证'}</span>
+                                    <span class="welcome-line">${data.welcomeLine4 || '这份开心'}</span>
+                                </div>
+                                <div class="welcome-badge">
+                                    <span>WELCOME</span>
+                                </div>
+                            </div>
+                            <div class="image-container soft-round">
+                                <img src="https://pic2.zhimg.com/v2-3984b0cbd049d31c3a35544c76495c25_r.jpg" class="section-image" alt="欢迎">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 日历区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-top">
+                            <div class="image-container soft-heart">
+                                <img src="https://gd-hbimg.huaban.com/7a3db05e182ad2215aaa98205ee93cf1265051fe3171b-7OpXsy_fw658" class="section-image" alt="日历">
+                            </div>
+                            <div class="text-container full">
+                                <div class="date-banner">
+                                    <span class="date-big">${formatMonthDay(data.weddingDate) || '09.14'}</span>
+                                    <span class="date-small">${getYearFromDate(data.weddingDate) || '2027'}</span>
+                                </div>
+
+                                <div class="mini-calendar">
+                                    <div class="cal-weekdays">
+                                        <span class="cal-weekday">一</span>
+                                        <span class="cal-weekday">二</span>
+                                        <span class="cal-weekday">三</span>
+                                        <span class="cal-weekday">四</span>
+                                        <span class="cal-weekday">五</span>
+                                        <span class="cal-weekday">六</span>
+                                        <span class="cal-weekday">日</span>
+                                    </div>
+                                    <div class="cal-dates">
+                                        <div class="cal-date"><span></span></div>
+                                        <div class="cal-date"><span></span></div>
+                                        <div class="cal-date"><span>1</span></div>
+                                        <div class="cal-date"><span>2</span></div>
+                                        <div class="cal-date"><span>3</span></div>
+                                        <div class="cal-date"><span>4</span></div>
+                                        <div class="cal-date"><span>5</span></div>
+                                        <div class="cal-date"><span>6</span></div>
+                                        <div class="cal-date"><span>7</span></div>
+                                        <div class="cal-date"><span>8</span></div>
+                                        <div class="cal-date"><span>9</span></div>
+                                        <div class="cal-date"><span>10</span></div>
+                                        <div class="cal-date"><span>11</span></div>
+                                        <div class="cal-date"><span>12</span></div>
+                                        <div class="cal-date"><span>13</span></div>
+                                        <div class="cal-date wedding-day"><span>${getDayFromDate(data.weddingDate) || '14'}</span></div>
+                                        <div class="cal-date"><span>15</span></div>
+                                        <div class="cal-date"><span>16</span></div>
+                                        <div class="cal-date"><span>17</span></div>
+                                        <div class="cal-date"><span>18</span></div>
+                                        <div class="cal-date"><span>19</span></div>
+                                        <div class="cal-date"><span>20</span></div>
+                                        <div class="cal-date"><span>21</span></div>
+                                        <div class="cal-date"><span>22</span></div>
+                                        <div class="cal-date"><span>23</span></div>
+                                        <div class="cal-date"><span>24</span></div>
+                                        <div class="cal-date"><span>25</span></div>
+                                        <div class="cal-date"><span>26</span></div>
+                                        <div class="cal-date"><span>27</span></div>
+                                        <div class="cal-date"><span>28</span></div>
+                                        <div class="cal-date"><span>29</span></div>
+                                        <div class="cal-date"><span>30</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="place-info">
+                                    <span class="place-name">${data.placeName || '山里·山涧溪谷'}</span>
+                                    <div class="place-tags">
+                                        <span class="place-tag">${data.placeTag1 || '凤凰山'}</span>
+                                        <span class="place-tag">${data.placeTag2 || '涵碧楼酒店'}</span>
+                                    </div>
+                                    <div class="nav-card" onclick="navigateToLocation('${data.navAddress || '凤凰山风景区'}')">
+                                        <div class="nav-card-left">
+                                            <span class="nav-card-title">点击导航</span>
+                                            <span class="nav-card-address">${data.navAddress || '凤凰山风景区'}</span>
+                                        </div>
+                                        <div class="nav-card-right">
+                                            <span class="nav-card-icon">→</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 婚礼详情区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-left">
+                            <div class="image-container square-normal">
+                                <img src="https://pic1.zhimg.com/v2-56d06fd43be37b3b9b94ab37547cb180_r.jpg" class="section-image" alt="婚礼详情">
+                            </div>
+                            <div class="text-container">
+                                <div class="detail-banner">
+                                    <span class="detail-day">${data.weddingDate || '2027-09-14'}</span>
+                                    <span class="detail-week">${getWeekday(data.weddingDate) || '星期二'}</span>
+                                </div>
+                                <div class="info-pair">
+                                    <span class="info-label">婚礼时间</span>
+                                    <span class="info-value">${data.weddingTime || '农历四月廿二 12:00'}</span>
+                                </div>
+                                <div class="info-pair">
+                                    <span class="info-label">婚礼地点</span>
+                                    <span class="info-value">${data.weddingAddress || '婚贝大酒店A栋9F'}</span>
+                                </div>
+                                ${data.weddingPhone ? `
+                                <div class="info-pair">
+                                    <span class="info-label">联系电话</span>
+                                    <span class="info-value" style="color: #e9a4a4;">${data.weddingPhone}</span>
+                                </div>
+                                ` : ''}
+                                ${data.weddingEmail ? `
+                                <div class="info-pair">
+                                    <span class="info-label">联系邮箱</span>
+                                    <span class="info-value" style="color: #e9a4a4; font-size: 20px;">${data.weddingEmail}</span>
+                                </div>
+                                ` : ''}
+                                <div class="nav-button small" onclick="navigateToLocation('${data.weddingAddress || '婚贝大酒店A栋9F'}')">
+                                    <span class="nav-icon">📍</span>
+                                    <span class="nav-text">导航到酒店</span>
+                                </div>
+                                <div class="gentle-words">
+                                    <span class="gentle-word">${data.gentleWord1 || '漫长人生零零碎碎'}</span>
+                                    <span class="gentle-word">${data.gentleWord2 || '普通又温暖'}</span>
+                                    <span class="gentle-word">${data.gentleWord3 || '我用最浪漫的方式登场'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RSVP表单区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner form-center">
+                            <div class="form-card">
+                                <span class="form-head">${data.rsvpTitle || '婚礼回执'}</span>
+                                <div class="field">
+                                    <span class="field-label">姓名</span>
+                                    <input type="text" placeholder="${data.namePlaceholder || '请输入您的姓名'}" class="field-input" id="rsvpName">
+                                </div>
+                                <div class="field">
+                                    <span class="field-label">出席人数</span>
+                                    <div class="guest-picker">
+                                        <div class="picker-btn" onclick="updateGuests(-1)">−</div>
+                                        <span class="picker-number" id="guestCount">${data.defaultGuests || '1'}</span>
+                                        <div class="picker-btn" onclick="updateGuests(1)">+</div>
+                                    </div>
+                                </div>
+                                <button class="send-btn" onclick="submitRSVP()">${data.rsvpButton || '发送'}</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 礼物区 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-right">
+                            <div class="text-container">
+                                <div class="gentle-words">
+                                    <span class="gentle-word">${data.giftWord1 || '生命中有有的人'}</span>
+                                    <span class="gentle-word">${data.giftWord2 || '是像礼物一般的存在'}</span>
+                                    <span class="gentle-word">${data.giftWord3 || '是一想到就觉得'}</span>
+                                    <span class="gentle-word">${data.giftWord4 || '心底忽而亮堂'}</span>
+                                </div>
+                                <span class="poetic-line highlight">${data.giftLine1 || '而你，于我而言'}</span>
+                                <span class="poetic-line highlight">${data.giftLine2 || '便是这样的存在'}</span>
+                                <div class="gift-message">
+                                    <span class="gift-title">${data.giftTitle || '祝福礼物'}</span>
+                                    <span class="gift-note">${data.giftNote1 || '礼物金额实时转入'}</span>
+                                    <span class="gift-note">${data.giftNote2 || '制作人婚贝账户'}</span>
+                                </div>
+                            </div>
+                            <div class="image-container soft-arch">
+                                <img src="https://ts1.tc.mm.bing.net/th/id/OIP-C.nHo_-NNUgxDX7bt-ljngCQHaLG" class="section-image" alt="礼物">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部功能区 -->
+                    <div class="footer-section">
+                        <div class="footer-actions">
+                            <div class="footer-action" onclick="showMessageBox()">
+                                <span class="action-emoji">💬</span>
+                                <span class="action-name">${data.actionName1 || '祝福留言'}</span>
+                            </div>
+                            <div class="footer-action" onclick="showGiftBox()">
+                                <span class="action-emoji">🎁</span>
+                                <span class="action-name">${data.actionName2 || '烟火贺喜'}</span>
+                            </div>
+                            <div class="footer-action" onclick="sharePage()">
+                                <span class="action-emoji">❤️</span>
+                                <span class="action-name">${data.actionName3 || '分享'}</span>
+                            </div>
+                        </div>
+                        <div class="footer-stats">
+                            <span class="stat-number">${data.statNumber || '99'}</span>
+                            <span class="stat-label">${data.statLabel || '祝福留言 · 烟火贺喜 · 分享'}</span>
+                        </div>
+                        <div class="footer-info">
+                            <span class="info-text">${data.infoText || '长按保存图片分享'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成简约现代模板HTML
+        function renderModernTemplate(data) {
+            return `
+                <div class="modern-invitation">
+                    <!-- 封面区 -->
+                    <div class="cover-section">
+                        <div class="cover-content">
+                            <span class="invite-label">${data.inviteLabel2 || '我们结婚啦'}</span>
+                            <div class="couple-names">
+                                <span class="name">${data.groomName || '陈述'}</span>
+                                <span class="and">·</span>
+                                <span class="name">${data.brideName || '诗意'}</span>
+                            </div>
+                            <div class="date-location">
+                                <span class="wedding-date">${formatDate(data.weddingDate) || '2027.10.16'} 周六</span>
+                                <span class="wedding-time">${data.weddingTime || '16:30'}</span>
+                            </div>
+                            <div class="minimal-line"></div>
+                            <span class="short-quote">${data.vowsText || '想和你一起，慢慢变老'}</span>
+                        </div>
+                        <div class="scroll-indicator">
+                            <span class="scroll-text">往下滑动</span>
+                            <span class="scroll-arrow">⌄</span>
+                        </div>
+                    </div>
+
+                    ${data.storyText ? `
+                    <!-- 我们的故事 -->
+                    <div class="story-section">
+                        <div class="story-content">
+                            <span class="story-year">${data.meetYear || '2022'} - ${getYearFromDate(data.weddingDate) || '2027'}</span>
+                            <span class="story-title">${data.storyTitle || '从相遇到相伴'}</span>
+                            <div class="story-line"></div>
+                            <span class="story-text">${data.storyText}</span>
+                            <div class="story-numbers">
+                                <div class="number-item">
+                                    <span class="number">${data.daysTogether || '1826'}</span>
+                                    <span class="number-label">在一起的每一天</span>
+                                </div>
+                                <div class="number-item">
+                                    <span class="number">${data.citiesCount || '37'}</span>
+                                    <span class="number-label">一起去过的城市</span>
+                                </div>
+                                <div class="number-item">
+                                    <span class="number">∞</span>
+                                    <span class="number-label">未来的日子</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- 相遇 - 左右分屏设计 -->
+                    <div class="section-wrapper split-section">
+                        <div class="section-inner image-left">
+                            <div class="image-container square-gallery image-rounded">
+                                <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=400&h=400&fit=crop" class="section-image" alt="相遇">
+                            </div>
+                            <div class="text-container modern-text">
+                                <span class="section-number">01</span>
+                                <span class="poetic-line-large">${data.meetTitle || '第一次见你'}</span>
+                                <span class="poetic-line-sub">${data.meetSubtitle || '图书馆的午后，阳光正好'}</span>
+                                <div class="quote-block">
+                                    <span class="quote-modern">${data.firstQuote || '“你好，这本书我也很喜欢”'}</span>
+                                    <span class="quote-author">${data.quoteAuthor || '—— 我们的第一句话'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 相知 - 错位布局 -->
+                    <div class="section-wrapper">
+                        <div class="section-inner image-right">
+                            <div class="text-container modern-text">
+                                <span class="section-number">02</span>
+                                <span class="poetic-line-large">${data.knowTitle || '慢慢了解你'}</span>
+                                <span class="poetic-line-sub">${data.knowSubtitle || '才发现，原来我们这么合拍'}</span>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-icon">☕</span>
+                                        <span class="detail-label">${data.detail1 || '都喜欢拿铁'}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">📷</span>
+                                        <span class="detail-label">${data.detail2 || '都喜欢拍照'}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">🎵</span>
+                                        <span class="detail-label">${data.detail3 || '歌单总是一样'}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">🌅</span>
+                                        <span class="detail-label">${data.detail4 || '都喜欢看日出'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="image-container square-gallery image-circle">
+                                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&h=400&fit=crop" class="section-image" alt="相知">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 恋爱足迹 - 多图拼贴 -->
+                    <div class="section-wrapper collage-section">
+                        <div class="text-center">
+                            <span class="section-number">03</span>
+                            <span class="section-title-large">${data.footprintTitle || '恋爱足迹'}</span>
+                        </div>
+
+                        <div class="collage-grid">
+                            <div class="collage-item large">
+                                <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=400&fit=crop" class="collage-image" alt="足迹1">
+                                <div class="collage-overlay">
+                                    <span class="collage-text">${data.collageText1 || '第一次旅行 · 厦门'}</span>
+                                </div>
+                            </div>
+
+                            <div class="collage-row">
+                                <div class="collage-item medium image-rounded">
+                                    <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=300&h=300&fit=crop" class="collage-image" alt="足迹2">
+                                    <div class="collage-overlay small">
+                                        <span class="collage-text-small">${data.collageText2 || '第一场雪'}</span>
+                                    </div>
+                                </div>
+                                <div class="collage-item medium image-circle">
+                                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=300&h=300&fit=crop" class="collage-image" alt="足迹3">
+                                    <div class="collage-overlay small">
+                                        <span class="collage-text-small">${data.collageText3 || '求婚那天'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collage-row">
+                                <div class="collage-item small image-polaroid">
+                                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=200&h=200&fit=crop" class="collage-image" alt="足迹4">
+                                </div>
+                                <div class="collage-item small image-polaroid">
+                                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&h=200&fit=crop" class="collage-image" alt="足迹5">
+                                </div>
+                                <div class="collage-item small image-polaroid">
+                                    <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=200&h=200&fit=crop" class="collage-image" alt="足迹6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 誓言 - 全屏文字设计 -->
+                    <div class="vows-section">
+                        <div class="vows-content">
+                            <span class="vows-label">${data.vowsLabel || '我们说好'}</span>
+                            <div class="vows-line"></div>
+                            <span class="vows-text">${data.vowsLine1 || '以后的日子，一起做饭一起洗碗'}</span>
+                            <span class="vows-text">${data.vowsLine2 || '一起看剧一起吐槽'}</span>
+                            <span class="vows-text">${data.vowsLine3 || '一起旅行一起迷路'}</span>
+                            <span class="vows-text">${data.vowsLine4 || '一起慢慢变老'}</span>
+                            <div class="vows-signature">
+                                <span class="signature-name">${data.groomName || '陈述'}</span>
+                                <span class="signature-and">❤</span>
+                                <span class="signature-name">${data.brideName || '诗意'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 甜蜜瞬间 - 旋转木马 -->
+                    <div class="section-wrapper">
+                        <div class="text-center">
+                            <span class="section-number">04</span>
+                            <span class="section-title-large">${data.sweetTitle || '甜蜜瞬间'}</span>
+                        </div>
+
+                        <div class="carousel-scroll">
+                            <div class="carousel-track">
+                                <div class="carousel-item image-hexagon">
+                                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&h=300&fit=crop" class="carousel-image" alt="甜蜜1">
+                                </div>
+                                <div class="carousel-item image-rounded">
+                                    <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=300&h=300&fit=crop" class="carousel-image" alt="甜蜜2">
+                                </div>
+                                <div class="carousel-item image-circle">
+                                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=300&h=300&fit=crop" class="carousel-image" alt="甜蜜3">
+                                </div>
+                                <div class="carousel-item image-heart">
+                                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=300&h=300&fit=crop" class="carousel-image" alt="甜蜜4">
+                                </div>
+                                <div class="carousel-item image-diamond">
+                                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=300&h=300&fit=crop" class="carousel-image" alt="甜蜜5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 倒计时 - 现代卡片设计 -->
+                    <div class="section-wrapper">
+                        <div class="countdown-modern">
+                            <span class="countdown-label">${data.countdownLabel || '距离婚礼还有'}</span>
+                            <div class="countdown-cards">
+                                <div class="countdown-card">
+                                    <span class="card-number">${data.days || '127'}</span>
+                                    <span class="card-label">天</span>
+                                </div>
+                                <div class="countdown-card">
+                                    <span class="card-number">${data.hours || '8'}</span>
+                                    <span class="card-label">时</span>
+                                </div>
+                                <div class="countdown-card">
+                                    <span class="card-number">${data.minutes || '24'}</span>
+                                    <span class="card-label">分</span>
+                                </div>
+                                <div class="countdown-card">
+                                    <span class="card-number">${data.seconds || '36'}</span>
+                                    <span class="card-label">秒</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 邀请函 - 优雅排版 -->
+                    <div class="section-wrapper">
+                        <div class="invitation-card">
+                            <span class="invitation-title">${data.invitationTitle || '邀请你来'}</span>
+                            <div class="invitation-line"></div>
+                            <span class="invitation-text">${data.invitationText || '经过1826天的相处，我们决定把往后余生交给彼此。想邀请最重要的你，来见证我们的幸福时刻。'}</span>
+                            <div class="invitation-details">
+                                <div class="detail-row">
+                                    <span class="detail-icon-modern">⏰</span>
+                                    <span class="detail-text-modern">${data.weddingDate || '2027年10月16日'} 周六 ${data.weddingTime || '16:30'}</span>
+                                </div>
+                                ${data.weddingPhone ? `
+                                <div class="detail-row">
+                                    <span class="detail-icon-modern">📞</span>
+                                    <span class="detail-text-modern">联系电话：${data.weddingPhone}</span>
+                                </div>
+                                ` : ''}
+                                ${data.weddingEmail ? `
+                                <div class="detail-row">
+                                    <span class="detail-icon-modern">✉️</span>
+                                    <span class="detail-text-modern">联系邮箱：${data.weddingEmail}</span>
+                                </div>
+                                ` : ''}
+                                <div class="detail-row">
+                                    <span class="detail-icon-modern">📍</span>
+                                    <span class="detail-text-modern">${data.weddingAddress || '城市之光艺术中心 · 百合厅'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-icon-modern">👔</span>
+                                    <span class="detail-text-modern">${data.dressCode || '穿的舒服就好，不用太正式'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 导航 - 极简卡片 -->
+                    <div class="section-wrapper">
+                        <div class="map-card">
+                            <div class="map-info">
+                                <span class="map-title">${data.mapTitle || '城市之光艺术中心'}</span>
+                                <span class="map-address">${data.mapAddress || '滨江大道188号 · 百合厅'}</span>
+                                <div class="map-tags">
+                                    <span class="map-tag">${data.mapTag1 || '地铁2号线直达'}</span>
+                                    <span class="map-tag">${data.mapTag2 || '停车场免费'}</span>
+                                </div>
+                            </div>
+                            <div class="nav-button-modern" onclick="navigateToLocation('${data.mapAddress || '滨江大道188号'}')">
+                                <span class="nav-icon">📍</span>
+                                <span class="nav-text">点我导航</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RSVP - 极简表单 -->
+                    <div class="section-wrapper">
+                        <div class="rsvp-modern">
+                            <span class="rsvp-title">${data.rsvpTitle2 || '来不来，都告诉我一声'}</span>
+                            <span class="rsvp-subtitle">${data.rsvpSubtitle || '方便我们安排座位和饭菜'}</span>
+
+                            <div class="form-modern">
+                                <div class="form-group">
+                                    <span class="form-label">${data.nameLabel || '怎么称呼你'}</span>
+                                    <input type="text" placeholder="${data.namePlaceholder2 || '比如：小明'}" class="form-input-modern" id="modernName">
+                                </div>
+
+                                <div class="form-group">
+                                    <span class="form-label">${data.guestsLabel || '几个人来'}</span>
+                                    <div class="guest-selector-modern">
+                                        <div class="selector-btn-modern" onclick="updateModernGuests(-1)">−</div>
+                                        <span class="selector-number-modern" id="modernGuestCount">${data.defaultGuests2 || '2'}</span>
+                                        <div class="selector-btn-modern" onclick="updateModernGuests(1)">+</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <span class="form-label">${data.dietLabel || '有啥忌口的吗'}</span>
+                                    <div class="diet-options">
+                                        <span class="diet-option ${!data.dietOption1 || data.dietOption1 === '啥都能吃' ? 'selected' : ''}" onclick="selectDiet(this, '${data.dietOption1 || '啥都能吃'}')">${data.dietOption1 || '啥都能吃'}</span>
+                                        <span class="diet-option" onclick="selectDiet(this, '${data.dietOption2 || '不吃辣'}')">${data.dietOption2 || '不吃辣'}</span>
+                                        <span class="diet-option" onclick="selectDiet(this, '${data.dietOption3 || '不吃香菜'}')">${data.dietOption3 || '不吃香菜'}</span>
+                                        <span class="diet-option" onclick="selectDiet(this, '${data.dietOption4 || '素食'}')">${data.dietOption4 || '素食'}</span>
+                                        <span class="diet-option" onclick="selectDiet(this, '${data.dietOption5 || '海鲜过敏'}')">${data.dietOption5 || '海鲜过敏'}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <span class="form-label">${data.messageLabel || '想对我们说的话'}</span>
+                                    <textarea placeholder="${data.messagePlaceholder || '随便说点啥...'}" class="form-textarea" id="modernMessage"></textarea>
+                                </div>
+
+                                <button class="submit-btn-modern" onclick="submitModernRSVP()">${data.submitButton || '好的，收到'}</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 礼物 - 简约心意 -->
+                    <div class="section-wrapper">
+                        <div class="gift-modern">
+                            <div class="gift-icon-section">
+                                <span class="gift-icon">🎁</span>
+                            </div>
+                            <span class="gift-title-modern">${data.giftTitle2 || '关于礼物'}</span>
+                            <span class="gift-text-modern">${data.giftText2 || '人来就好，不用带礼物。如果实在想表示心意，包个小红包给我们当蜜月基金，我们也会很开心哒。'}</span>
+                            <div class="gift-qr-placeholder">
+                                <span class="qr-placeholder-text">${data.qrText || '❤️ 心意通道'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部功能区 - 极简设计 -->
+                    <div class="footer-modern">
+                        <div class="footer-actions-modern">
+                            <div class="footer-action-modern" onclick="showMessageBox()">
+                                <span class="action-emoji-modern">💬</span>
+                                <span class="action-text-modern">${data.actionText1 || '祝福墙'}</span>
+                            </div>
+                            <div class="footer-action-modern" onclick="sharePage()">
+                                <span class="action-emoji-modern">📸</span>
+                                <span class="action-text-modern">${data.actionText2 || '分享'}</span>
+                            </div>
+                            <div class="footer-action-modern" onclick="likePage()">
+                                <span class="action-emoji-modern">❤️</span>
+                                <span class="action-text-modern">${data.actionText3 || '点赞'}</span>
+                            </div>
+                        </div>
+                        <div class="footer-stats-modern">
+                            <span>${data.statsText || '已有 128 条祝福'}</span>
+                        </div>
+                        <div class="footer-copyright">
+                            <span>${data.copyrightText || '陈述 & 林诗意 · 邀请函'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成中式传统模板HTML
+        function renderChineseTemplate(data) {
+            return `
+                <div class="chinese-invitation">
+                    <!-- 封面区 - 中国红背景 -->
+                    <div class="cover-section">
+                        <div class="cover-pattern-top"></div>
+                        <div class="cover-content">
+                            <span class="chinese-char">囍</span>
+                            <span class="invite-label">${data.chineseInviteLabel || '婚 礼 邀 请 函'}</span>
+                            <div class="couple-names">
+                                <span class="name">${data.groomName || '张逸轩'}</span>
+                                <span class="and">❤</span>
+                                <span class="name">${data.brideName || '李婉晴'}</span>
+                            </div>
+                            <span class="wedding-date">${data.lunarDate || '己亥年 九月初八'}</span>
+                            <span class="wedding-date-en">${formatDate(data.weddingDate) || '2027.10.16'}</span>
+                            <div class="double-happiness">
+                                <span class="double">囍</span>
+                                <span class="double">囍</span>
+                            </div>
+                        </div>
+                        <div class="cover-pattern-bottom"></div>
+                        <div class="scroll-hint chinese-scroll">
+                            <span>${data.scrollText || '恭请 尊驾'}</span>
+                            <span class="arrow">⌄</span>
+                        </div>
+                    </div>
+
+                    <!-- 新人介绍区 -->
+                    <div class="section-wrapper chinese-section">
+                        <div class="section-title-wrapper">
+                            <span class="chinese-section-title">${data.introTitle || '良 缘 天 定'}</span>
+                            <div class="title-decoration">
+                                <span class="decoration-left">❤</span>
+                                <span class="decoration-center">${data.introSubtitle || '佳偶天成'}</span>
+                                <span class="decoration-right">❤</span>
+                            </div>
+                        </div>
+
+                        <div class="couple-intro">
+                            <div class="intro-item groom">
+                                <div class="intro-icon">👨</div>
+                                <span class="intro-name">${data.groomName || '张逸轩'}</span>
+                                <span class="intro-desc">${data.groomDesc || '新郎 · 温润如玉'}</span>
+                            </div>
+                            <div class="intro-middle">
+                                <span class="middle-char">囍</span>
+                                <span class="middle-text">${data.middleText || '百年好合'}</span>
+                            </div>
+                            <div class="intro-item bride">
+                                <div class="intro-icon">👩</div>
+                                <span class="intro-name">${data.brideName || '李婉晴'}</span>
+                                <span class="intro-desc">${data.brideDesc || '新娘 · 娴静雅致'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 婚宴信息区 - 传统红底金纹 -->
+                    <div class="section-wrapper red-section">
+                        <div class="gold-pattern"></div>
+                        <div class="wedding-info">
+                            <span class="info-title">${data.infoTitle || '婚 宴 盛 典'}</span>
+                            <div class="info-item">
+                                <span class="info-icon">⏰</span>
+                                <span class="info-text">${data.weddingTime || '农历九月初八 · 酉时'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">📍</span>
+                                <span class="info-text">${data.weddingAddress || '王府井大酒店 · 紫金厅'}</span>
+                            </div>
+                            ${data.weddingPhone ? `
+                            <div class="info-item">
+                                <span class="info-icon">📞</span>
+                                <span class="info-text" style="color: #ffd700;">联系电话：${data.weddingPhone}</span>
+                            </div>
+                            ` : ''}
+                            ${data.weddingEmail ? `
+                            <div class="info-item">
+                                <span class="info-icon">✉️</span>
+                                <span class="info-text" style="color: #ffd700; font-size: 22px;">联系邮箱：${data.weddingEmail}</span>
+                            </div>
+                            ` : ''}
+                            <div class="info-item">
+                                <span class="info-icon">🎎</span>
+                                <span class="info-text">${data.traditionText || '三书六礼 · 明媒正娶'}</span>
+                            </div>
+                            <div class="divider-chinese"></div>
+                            <span class="traditional-quote">${data.traditionalQuote || '“死生契阔，与子成说。执子之手，与子偕老。”'}</span>
+                        </div>
+                    </div>
+
+                    <!-- 婚礼流程 - 竖排时间轴 -->
+                    <div class="section-wrapper">
+                        <div class="section-title-wrapper">
+                            <span class="chinese-section-title">${data.processTitle || '婚 礼 仪 程'}</span>
+                        </div>
+
+                        <div class="timeline-chinese">
+                            <div class="timeline-item-chinese">
+                                <div class="time-badge">${data.welcomeTime || '16:08'}</div>
+                                <div class="event-content">
+                                    <span class="event-name">${data.event1 || '亲 迎'}</span>
+                                    <span class="event-desc">${data.eventDesc1 || '新郎迎亲 · 花轿待发'}</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-chinese">
+                                <div class="time-badge">${data.ceremonyTime || '16:38'}</div>
+                                <div class="event-content">
+                                    <span class="event-name">${data.event2 || '奠 雁'}</span>
+                                    <span class="event-desc">${data.eventDesc2 || '三拜九叩 · 共结连理'}</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-chinese">
+                                <div class="time-badge">${data.veilTime || '17:18'}</div>
+                                <div class="event-content">
+                                    <span class="event-name">${data.event3 || '却 扇'}</span>
+                                    <span class="event-desc">${data.eventDesc3 || '挑盖头 · 夫妻对拜'}</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-chinese">
+                                <div class="time-badge">${data.dinnerTime || '18:08'}</div>
+                                <div class="event-content">
+                                    <span class="event-name">${data.event4 || '婚 宴'}</span>
+                                    <span class="event-desc">${data.eventDesc4 || '喜宴开始 · 敬酒谢宾'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 传统纹样装饰区 -->
+                    <div class="decoration-section">
+                        <div class="cloud-pattern"></div>
+                        <div class="chinese-knot">
+                            <span class="knot-char">${data.knotChar || '福'}</span>
+                        </div>
+                        <div class="cloud-pattern reverse"></div>
+                    </div>
+
+                    <!-- 照片区 - 中式屏风格 -->
+                    <div class="section-wrapper">
+                        <div class="section-title-wrapper">
+                            <span class="chinese-section-title">${data.galleryTitle || '花 好 月 圆'}</span>
+                        </div>
+
+                        <div class="chinese-gallery">
+                            <div class="gallery-frame left">
+                                <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300&h=400&fit=crop" class="gallery-image" alt="囍">
+                                <div class="frame-decoration">${data.frameText1 || '囍'}</div>
+                            </div>
+                            <div class="gallery-frame center">
+                                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=300&h=400&fit=crop" class="gallery-image" alt="百年">
+                                <div class="frame-decoration">${data.frameText2 || '百年'}</div>
+                            </div>
+                            <div class="gallery-frame right">
+                                <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=300&h=400&fit=crop" class="gallery-image" alt="好合">
+                                <div class="frame-decoration">${data.frameText3 || '好合'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 长辈祝福区 -->
+                    <div class="section-wrapper red-section-light">
+                        <div class="blessing-card">
+                            <span class="blessing-title">${data.blessingTitle || '双 亲 祝 福'}</span>
+                            <div class="blessing-content">
+                                <span class="blessing-line">${data.blessingLine1 || '喜今日赤绳系定，珠联璧合'}</span>
+                                <span class="blessing-line">${data.blessingLine2 || '卜他年白头永偕，桂馥兰馨'}</span>
+                                <span class="blessing-line">${data.blessingLine3 || '愿二位新人：'}</span>
+                                <span class="blessing-line">${data.blessingLine4 || '相敬如宾，永谐鱼水之欢'}</span>
+                                <span class="blessing-line">${data.blessingLine5 || '互助精诚，共盟鸳鸯之誓'}</span>
+                            </div>
+                            <div class="blessing-signature">
+                                <span>${data.blessingSignature || '双方父母 敬贺'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 地图导航 - 传统风格 -->
+                    <div class="section-wrapper">
+                        <div class="map-card-chinese">
+                            <div class="map-header">
+                                <span class="map-title-chinese">${data.mapTitleChinese || '王府井大酒店'}</span>
+                                <span class="map-subtitle">${data.mapSubtitle || '紫金厅 · 三楼'}</span>
+                            </div>
+                            <div class="map-address-chinese">
+                                <span>${data.mapAddressChinese || '北京市东城区王府井大街88号'}</span>
+                            </div>
+                            <div class="map-tags-chinese">
+                                <span class="map-tag-chinese">${data.mapTagChinese1 || '地铁1号线王府井站'}</span>
+                                <span class="map-tag-chinese">${data.mapTagChinese2 || '免费停车'}</span>
+                            </div>
+                            <div class="nav-button-chinese" onclick="navigateToLocation('${data.mapAddressChinese || '北京市东城区王府井大街88号'}')">
+                                <span class="nav-icon">📍</span>
+                                <span class="nav-text">点我导航</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RSVP表单 - 中式风格 -->
+                    <div class="section-wrapper">
+                        <div class="rsvp-chinese">
+                            <span class="rsvp-title-chinese">${data.rsvpTitleChinese || '惠 赐 佳 音'}</span>
+                            <span class="rsvp-subtitle-chinese">${data.rsvpSubtitleChinese || '敬请回复，以便安排席位'}</span>
+
+                            <div class="form-chinese">
+                                <div class="form-group-chinese">
+                                    <span class="form-label-chinese">${data.nameLabelChinese || '尊姓大名'}</span>
+                                    <input type="text" placeholder="${data.namePlaceholderChinese || '例如：王世仁'}" class="form-input-chinese" id="chineseName">
+                                </div>
+
+                                <div class="form-group-chinese">
+                                    <span class="form-label-chinese">${data.guestsLabelChinese || '随行人数'}</span>
+                                    <div class="guest-selector-chinese">
+                                        <div class="selector-btn-chinese" onclick="updateChineseGuests(-1)">−</div>
+                                        <span class="selector-number-chinese" id="chineseGuestCount">${data.defaultGuestsChinese || '2'}</span>
+                                        <div class="selector-btn-chinese" onclick="updateChineseGuests(1)">+</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-chinese">
+                                    <span class="form-label-chinese">${data.dietLabelChinese || '饮食禁忌'}</span>
+                                    <div class="diet-options-chinese">
+                                        <span class="diet-option-chinese ${!data.dietOptionChinese1 || data.dietOptionChinese1 === '无忌口' ? 'selected' : ''}" onclick="selectChineseDiet(this, '${data.dietOptionChinese1 || '无忌口'}')">${data.dietOptionChinese1 || '无忌口'}</span>
+                                        <span class="diet-option-chinese" onclick="selectChineseDiet(this, '${data.dietOptionChinese2 || '素食'}')">${data.dietOptionChinese2 || '素食'}</span>
+                                        <span class="diet-option-chinese" onclick="selectChineseDiet(this, '${data.dietOptionChinese3 || '清真'}')">${data.dietOptionChinese3 || '清真'}</span>
+                                        <span class="diet-option-chinese" onclick="selectChineseDiet(this, '${data.dietOptionChinese4 || '忌辛辣'}')">${data.dietOptionChinese4 || '忌辛辣'}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-chinese">
+                                    <span class="form-label-chinese">${data.messageLabelChinese || '祝 福 语'}</span>
+                                    <textarea placeholder="${data.messagePlaceholderChinese || '写下您的祝福...'}" class="form-textarea-chinese" id="chineseMessage"></textarea>
+                                </div>
+
+                                <button class="submit-btn-chinese" onclick="submitChineseRSVP()">${data.submitButtonChinese || '确 认'}</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 礼金区 - 传统红包样式 -->
+                    <div class="section-wrapper">
+                        <div class="gift-chinese">
+                            <div class="red-envelope">
+                                <span class="envelope-char">囍</span>
+                                <span class="envelope-text">${data.envelopeText || '贺 礼'}</span>
+                            </div>
+                            <span class="gift-title-chinese">${data.giftTitleChinese || '关于礼金'}</span>
+                            <span class="gift-text-chinese">${data.giftTextChinese || '人来即是厚礼，切莫破费。如蒙惠赐，请扫码随喜，我们将在婚后用于蜜月旅行。'}</span>
+                            <div class="gift-qr-chinese">
+                                <span class="qr-text">${data.qrTextChinese || '🧧 心意通道'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部功能区 - 中式设计 -->
+                    <div class="footer-chinese">
+                        <div class="footer-pattern"></div>
+                        <div class="footer-actions-chinese">
+                            <div class="footer-action-chinese" onclick="showMessageBox()">
+                                <span class="action-emoji-chinese">💬</span>
+                                <span class="action-text-chinese">${data.actionChinese1 || '祝福墙'}</span>
+                            </div>
+                            <div class="footer-action-chinese" onclick="sharePage()">
+                                <span class="action-emoji-chinese">📸</span>
+                                <span class="action-text-chinese">${data.actionChinese2 || '分享'}</span>
+                            </div>
+                            <div class="footer-action-chinese" onclick="likePage()">
+                                <span class="action-emoji-chinese">❤️</span>
+                                <span class="action-text-chinese">${data.actionChinese3 || '点赞'}</span>
+                            </div>
+                        </div>
+                        <div class="footer-stats-chinese">
+                            <span>${data.statsChinese || '已有 168 条祝福'}</span>
+                        </div>
+                        <div class="footer-copyright-chinese">
+                            <span>${data.copyrightChinese || '张逸轩 & 李婉晴 · 中式婚礼'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成海岛度假模板HTML
+        function renderIslandTemplate(data) {
+            return `
+                <div class="island-invitation">
+                    <!-- 封面区 -->
+                    <div class="cover-section">
+                        <div class="cover-wave wave-top"></div>
+                        <div class="cover-content">
+                            <span class="invite-label">${data.islandLabel || 'ISLAND WEDDING'}</span>
+                            <div class="couple-names">
+                                <span class="name">${data.groomName || '陈一帆'}</span>
+                                <span class="and">·</span>
+                                <span class="name">${data.brideName || '林浅夏'}</span>
+                            </div>
+                            <span class="wedding-date">${formatDate(data.weddingDate) || '2027.08.28'}</span>
+                            <span class="wedding-location">${data.weddingLocation || '普吉岛 · 卡塔海滩'}</span>
+                            <div class="palm-tree">
+                                <span class="palm">🌴</span>
+                                <span class="palm">🌴</span>
+                                <span class="palm">🌴</span>
+                            </div>
+                        </div>
+                        <div class="cover-wave wave-bottom"></div>
+                        <div class="scroll-hint island-scroll">
+                            <span>${data.islandScroll || '向 海 而 行'}</span>
+                            <span class="arrow">⌄</span>
+                        </div>
+                    </div>
+
+                    <!-- 我们的故事 - 海洋卡片 -->
+                    <div class="section-wrapper ocean-card">
+                        <div class="card-decoration">
+                            <span class="shell">🐚</span>
+                            <span class="starfish">⭐</span>
+                        </div>
+                        <div class="story-content">
+                            <span class="story-subtitle">${data.storySubtitle || '始于初见'}</span>
+                            <span class="story-title">${data.storyTitle || '海风知道我们的故事'}</span>
+                            <div class="story-line"></div>
+                            <span class="story-text">${data.storyText || '那年在普吉岛的夏天，海风轻拂过你的发梢。你说你喜欢海浪的声音，我说我喜欢你笑起来的样子。从此，每一个有海的地方，都想带你去看看。'}</span>
+                            <div class="story-tag">
+                                <span>${data.storyTag || '🌊 2022.07 · 普吉岛初见'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 海边誓言 - 极简留白 -->
+                    <div class="section-wrapper vow-section">
+                        <div class="vow-content">
+                            <span class="vow-quote">“</span>
+                            <span class="vow-text">${data.vow1 || '我愿做你的岛屿，'}</span>
+                            <span class="vow-text">${data.vow2 || '无论潮起潮落，'}</span>
+                            <span class="vow-text">${data.vow3 || '永远守候在这里。'}</span>
+                            <span class="vow-quote close">”</span>
+                            <div class="vow-signature">
+                                <span>${data.vowSignature || '—— 一帆 & 浅夏'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 照片墙 - 海洋生物风格 -->
+                    <div class="section-wrapper">
+                        <div class="section-header-island">
+                            <span class="section-title-island">${data.photoTitle || '· 海 洋 记 忆 ·'}</span>
+                        </div>
+
+                        <div class="photo-wall">
+                            <div class="photo-row">
+                                <div class="photo-item photo-wave">
+                                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=300&fit=crop" class="photo-img" alt="海边日落">
+                                    <div class="photo-caption">${data.photoCaption1 || '海边日落'}</div>
+                                </div>
+                                <div class="photo-item photo-shell">
+                                    <img src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=300&h=300&fit=crop" class="photo-img" alt="沙滩漫步">
+                                    <div class="photo-caption">${data.photoCaption2 || '沙滩漫步'}</div>
+                                </div>
+                            </div>
+                            <div class="photo-row">
+                                <div class="photo-item photo-star">
+                                    <img src="https://images.unsplash.com/photo-1519046905184-7696f9b6e4e6?w=300&h=300&fit=crop" class="photo-img" alt="出海浮潜">
+                                    <div class="photo-caption">${data.photoCaption3 || '出海浮潜'}</div>
+                                </div>
+                                <div class="photo-item photo-coral">
+                                    <img src="https://images.unsplash.com/photo-1537996192471-5a9c24b5b3a0?w=300&h=300&fit=crop" class="photo-img" alt="珊瑚礁">
+                                    <div class="photo-caption">${data.photoCaption4 || '珊瑚礁'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 婚礼信息 - 漂流瓶卡片 -->
+                    <div class="section-wrapper bottle-card">
+                        <div class="bottle-content">
+                            <span class="bottle-title">${data.bottleTitle || '🏝️ 婚 礼 邀 约 🏝️'}</span>
+
+                            <div class="info-row">
+                                <span class="info-icon">📅</span>
+                                <span class="info-text">${formatDate(data.weddingDate) || '2027年8月28日'} 周六</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-icon">⏰</span>
+                                <span class="info-text">${data.timeInfo || '夕阳仪式 · 18:08 晚宴'}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-icon">📍</span>
+                                <span class="info-text">${data.weddingAddress || '普吉岛 · 卡塔海滩 · 棕榈亭'}</span>
+                            </div>
+                            ${data.weddingPhone ? `
+                            <div class="info-row">
+                                <span class="info-icon">📞</span>
+                                <span class="info-text" style="color: #d97706;">联系电话：${data.weddingPhone}</span>
+                            </div>
+                            ` : ''}
+                            ${data.weddingEmail ? `
+                            <div class="info-row">
+                                <span class="info-icon">✉️</span>
+                                <span class="info-text" style="color: #d97706; font-size: 22px;">联系邮箱：${data.weddingEmail}</span>
+                            </div>
+                            ` : ''}
+                            <div class="info-row">
+                                <span class="info-icon">👗</span>
+                                <span class="info-text">${data.dressCode || '着装建议：海岛风 · 浅色系'}</span>
+                            </div>
+
+                            <div class="bottle-line"></div>
+
+                            <span class="bottle-note">${data.bottleNote || '请带上你最爱的草帽和墨镜，我们一起在海边跳舞到天黑。'}</span>
+                        </div>
+                        <div class="bottle-decoration">
+                            <span class="bottle-icon">🍾</span>
+                        </div>
+                    </div>
+
+                    <!-- 行程安排 - 潮汐表设计 -->
+                    <div class="section-wrapper tide-section">
+                        <div class="tide-header">
+                            <span class="tide-title">${data.tideTitle || '🌊 潮 汐 表 🌊'}</span>
+                        </div>
+
+                        <div class="timeline-tide">
+                            <div class="tide-item">
+                                <div class="tide-time">${data.checkInTime || '15:30'}</div>
+                                <div class="tide-content">
+                                    <span class="tide-event">${data.tideEvent1 || '宾客签到 · 欢迎饮品'}</span>
+                                    <span class="tide-desc">${data.tideDesc1 || '椰子水 & 热带水果'}</span>
+                                </div>
+                            </div>
+                            <div class="tide-item">
+                                <div class="tide-time">${data.ceremonyTime || '16:30'}</div>
+                                <div class="tide-content">
+                                    <span class="tide-event">${data.tideEvent2 || '夕阳仪式'}</span>
+                                    <span class="tide-desc">${data.tideDesc2 || '沙滩证婚 · 交换誓言'}</span>
+                                </div>
+                            </div>
+                            <div class="tide-item">
+                                <div class="tide-time">${data.dinnerTime || '18:08'}</div>
+                                <div class="tide-content">
+                                    <span class="tide-event">${data.tideEvent3 || '晚宴开始'}</span>
+                                    <span class="tide-desc">${data.tideDesc3 || '海鲜自助 · 篝火晚会'}</span>
+                                </div>
+                            </div>
+                            <div class="tide-item">
+                                <div class="tide-time">${data.fireworkTime || '20:08'}</div>
+                                <div class="tide-content">
+                                    <span class="tide-event">${data.tideEvent4 || '烟花派对'}</span>
+                                    <span class="tide-desc">${data.tideDesc4 || '海边烟花 · 星空舞蹈'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 地图导航 - 海岛风格 -->
+                    <div class="section-wrapper map-island">
+                        <div class="map-header-island">
+                            <span class="map-title-island">${data.mapTitleIsland || '🏖️ 卡塔海滩 · 棕榈亭 🏖️'}</span>
+                        </div>
+                        <div class="map-content">
+                            <span class="map-address-island">${data.mapAddressIsland || 'Kata Beach, Phuket, Thailand'}</span>
+                            <div class="map-tags-island">
+                                <span class="map-tag-island">${data.mapTagIsland1 || '从机场乘车45分钟'}</span>
+                                <span class="map-tag-island">${data.mapTagIsland2 || '酒店有接驳车'}</span>
+                            </div>
+                            <div class="nav-button-island" onclick="navigateToLocation('${data.mapAddressIsland || 'Kata Beach, Phuket, Thailand'}')">
+                                <span class="nav-icon">📍</span>
+                                <span class="nav-text-island">${data.navTextIsland || '打开地图导航'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RSVP表单 - 海岛风情 -->
+                    <div class="section-wrapper rsvp-island">
+                        <div class="rsvp-header-island">
+                            <span class="rsvp-title-island">${data.rsvpTitleIsland || '📬 漂 流 瓶 回 复 📬'}</span>
+                            <span class="rsvp-subtitle-island">${data.rsvpSubtitleIsland || '请告诉我们，你会来海边赴约吗？'}</span>
+                        </div>
+
+                        <div class="form-island">
+                            <div class="form-row">
+                                <span class="form-label-island">${data.nameLabelIsland || '你的名字'}</span>
+                                <input type="text" placeholder="${data.namePlaceholderIsland || '例如：张小浪'}" class="form-input-island" id="islandName">
+                            </div>
+
+                            <div class="form-row">
+                                <span class="form-label-island">${data.guestsLabelIsland || '几人同行'}</span>
+                                <div class="guest-selector-island">
+                                    <div class="selector-btn-island" onclick="updateIslandGuests(-1)">−</div>
+                                    <span class="selector-number-island" id="islandGuestCount">${data.defaultGuestsIsland || '2'}</span>
+                                    <div class="selector-btn-island" onclick="updateIslandGuests(1)">+</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <span class="form-label-island">${data.stayLabel || '住宿需求'}</span>
+                                <div class="stay-options">
+                                    <span class="stay-option ${!data.stayOption1 || data.stayOption1 === '需要推荐酒店' ? 'selected' : ''}" onclick="selectStay(this, '${data.stayOption1 || '需要推荐酒店'}')">${data.stayOption1 || '需要推荐酒店'}</span>
+                                    <span class="stay-option" onclick="selectStay(this, '${data.stayOption2 || '自行安排'}')">${data.stayOption2 || '自行安排'}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <span class="form-label-island">${data.foodLabel || '饮食偏好'}</span>
+                                <div class="food-options">
+                                    <span class="food-option ${!data.foodOption1 || data.foodOption1 === '海鲜🦞' ? 'selected' : ''}" onclick="selectFood(this, '${data.foodOption1 || '海鲜🦞'}')">${data.foodOption1 || '海鲜🦞'}</span>
+                                    <span class="food-option" onclick="selectFood(this, '${data.foodOption2 || '素食🥗'}')">${data.foodOption2 || '素食🥗'}</span>
+                                    <span class="food-option" onclick="selectFood(this, '${data.foodOption3 || '无禁忌😋'}')">${data.foodOption3 || '无禁忌😋'}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <span class="form-label-island">${data.messageLabelIsland || '想对我们说的话'}</span>
+                                <textarea placeholder="${data.messagePlaceholderIsland || '写下你的祝福...'}" class="form-textarea-island" id="islandMessage"></textarea>
+                            </div>
+
+                            <button class="submit-btn-island" onclick="submitIslandRSVP()">${data.submitButtonIsland || '发 送 漂 流 瓶'}</button>
+                        </div>
+                    </div>
+
+                    <!-- 礼物区 - 贝壳红包 -->
+                    <div class="section-wrapper gift-island">
+                        <div class="gift-card-island">
+                            <div class="shell-icon">🐚</div>
+                            <span class="gift-title-island">${data.giftTitleIsland || '关于礼物'}</span>
+                            <span class="gift-text-island">${data.giftTextIsland || '你能来，就是最好的礼物。如果实在想带点什么，就带一瓶你们家乡的沙子，让我们的海滩收集全世界的祝福。'}</span>
+                            <div class="gift-qr-island">
+                                <span class="qr-text-island">${data.qrTextIsland || '💝 心意通道'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部功能区 - 海浪设计 -->
+                    <div class="footer-island">
+                        <div class="footer-wave"></div>
+                        <div class="footer-actions-island">
+                            <div class="footer-action-island" onclick="showMessageBox()">
+                                <span class="action-emoji-island">💬</span>
+                                <span class="action-text-island">${data.actionIsland1 || '祝福墙'}</span>
+                            </div>
+                            <div class="footer-action-island" onclick="sharePage()">
+                                <span class="action-emoji-island">📸</span>
+                                <span class="action-text-island">${data.actionIsland2 || '分享'}</span>
+                            </div>
+                            <div class="footer-action-island" onclick="likePage()">
+                                <span class="action-emoji-island">❤️</span>
+                                <span class="action-text-island">${data.actionIsland3 || '点赞'}</span>
+                            </div>
+                        </div>
+                        <div class="footer-stats-island">
+                            <span>${data.statsIsland || '已有 99 个漂流瓶祝福'}</span>
+                        </div>
+                        <div class="footer-copyright-island">
+                            <span>${data.copyrightIsland || '一帆 & 浅夏 · 海岛婚礼'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 全局变量
+        let currentWorkData = null;
+        let guestCount = 1;
+        let modernGuestCount = 2;
+        let chineseGuestCount = 2;
+        let islandGuestCount = 2;
+        let selectedDiet = '啥都能吃';
+        let selectedChineseDiet = '无忌口';
+        let selectedStay = '需要推荐酒店';
+        let selectedFood = '海鲜🦞';
+
+        // 初始化页面
+        function initPage() {
+            currentWorkData = parseWorkData();
+            const templateId = currentWorkData.templateId || 1;
+            
+            let html = '';
+            switch(templateId) {
+                case 1:
+                    html = renderGardenTemplate(currentWorkData);
+                    break;
+                case 2:
+                    html = renderModernTemplate(currentWorkData);
+                    break;
+                case 3:
+                    html = renderChineseTemplate(currentWorkData);
+                    break;
+                case 4:
+                    html = renderIslandTemplate(currentWorkData);
+                    break;
+                default:
+                    html = renderGardenTemplate(currentWorkData);
+            }
+            
+            document.getElementById('template-container').innerHTML = html;
+            
+            // 更新页面标题
+            document.title = getTemplateName(templateId) + '邀请函';
+            
+            // 初始化计数器
+            guestCount = parseInt(currentWorkData.defaultGuests) || 1;
+            modernGuestCount = parseInt(currentWorkData.defaultGuests2) || 2;
+            chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
+            islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
+        }
+
+        // 导航到地点
+        function navigateToLocation(address) {
+            if (address) {
+                window.open(`https://maps.google.com/?q=${encodeURIComponent(address)}`);
+            }
+        }
+
+        // 更新人数
+        function updateGuests(delta) {
+            guestCount = Math.max(1, guestCount + delta);
+            const guestElement = document.getElementById('guestCount');
+            if (guestElement) {
+                guestElement.textContent = guestCount;
+            }
+        }
+
+        function updateModernGuests(delta) {
+            modernGuestCount = Math.max(1, modernGuestCount + delta);
+            const guestElement = document.getElementById('modernGuestCount');
+            if (guestElement) {
+                guestElement.textContent = modernGuestCount;
+            }
+        }
+
+        function updateChineseGuests(delta) {
+            chineseGuestCount = Math.max(1, chineseGuestCount + delta);
+            const guestElement = document.getElementById('chineseGuestCount');
+            if (guestElement) {
+                guestElement.textContent = chineseGuestCount;
+            }
+        }
+
+        function updateIslandGuests(delta) {
+            islandGuestCount = Math.max(1, islandGuestCount + delta);
+            const guestElement = document.getElementById('islandGuestCount');
+            if (guestElement) {
+                guestElement.textContent = islandGuestCount;
+            }
+        }
+
+        // 选择饮食偏好
+        function selectDiet(element, diet) {
+            document.querySelectorAll('.diet-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedDiet = diet;
+        }
+
+        function selectChineseDiet(element, diet) {
+            document.querySelectorAll('.diet-option-chinese').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedChineseDiet = diet;
+        }
+
+        function selectStay(element, stay) {
+            document.querySelectorAll('.stay-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedStay = stay;
+        }
+
+        function selectFood(element, food) {
+            document.querySelectorAll('.food-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedFood = food;
+        }
+
+        // 提交表单
+        function submitRSVP() {
+            const name = document.getElementById('rsvpName')?.value;
+            if (!name) {
+                showToast('请输入姓名');
+                return;
+            }
+            console.log('RSVP提交:', { name, guests: guestCount });
+            showToast('提交成功，感谢您的回复');
+            if (document.getElementById('rsvpName')) {
+                document.getElementById('rsvpName').value = '';
+            }
+        }
+
+        function submitModernRSVP() {
+            const name = document.getElementById('modernName')?.value;
+            const message = document.getElementById('modernMessage')?.value;
+            if (!name) {
+                showToast('请输入姓名');
+                return;
+            }
+            console.log('现代模板RSVP:', { 
+                name, 
+                guests: modernGuestCount, 
+                diet: selectedDiet,
+                message 
+            });
+            showToast('提交成功');
+            if (document.getElementById('modernName')) {
+                document.getElementById('modernName').value = '';
+            }
+            if (document.getElementById('modernMessage')) {
+                document.getElementById('modernMessage').value = '';
+            }
+        }
+
+        function submitChineseRSVP() {
+            const name = document.getElementById('chineseName')?.value;
+            const message = document.getElementById('chineseMessage')?.value;
+            if (!name) {
+                showToast('请输入姓名');
+                return;
+            }
+            console.log('中式模板RSVP:', { 
+                name, 
+                guests: chineseGuestCount, 
+                diet: selectedChineseDiet,
+                message 
+            });
+            showToast('提交成功');
+            if (document.getElementById('chineseName')) {
+                document.getElementById('chineseName').value = '';
+            }
+            if (document.getElementById('chineseMessage')) {
+                document.getElementById('chineseMessage').value = '';
+            }
+        }
+
+        function submitIslandRSVP() {
+            const name = document.getElementById('islandName')?.value;
+            const message = document.getElementById('islandMessage')?.value;
+            if (!name) {
+                showToast('请输入姓名');
+                return;
+            }
+            console.log('海岛模板RSVP:', { 
+                name, 
+                guests: islandGuestCount, 
+                stay: selectedStay,
+                food: selectedFood,
+                message 
+            });
+            showToast('提交成功');
+            if (document.getElementById('islandName')) {
+                document.getElementById('islandName').value = '';
+            }
+            if (document.getElementById('islandMessage')) {
+                document.getElementById('islandMessage').value = '';
+            }
+        }
+
+        // 显示留言弹窗
+        function showMessageBox() {
+            const message = prompt('请输入您的祝福留言：');
+            if (message) {
+                const name = prompt('请输入您的姓名：');
+                if (name) {
+                    console.log('留言:', { name, message });
+                    showToast('留言成功');
+                }
+            }
+        }
+
+        // 显示礼物弹窗
+        function showGiftBox() {
+            showToast('感谢您的祝福');
+        }
+
+        // 点赞
+        function likePage() {
+            showToast('感谢您的点赞');
+        }
+
+        // 分享页面
+        function sharePage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: '诚挚邀请您参加我们的婚礼',
+                    url: window.location.href
+                }).catch(() => {
+                    copyCurrentUrl();
+                });
+            } else {
+                copyCurrentUrl();
+            }
+        }
+
+        // 复制当前URL
+        function copyCurrentUrl() {
+            const textarea = document.createElement('textarea');
+            textarea.value = window.location.href;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('链接已复制');
+        }
+
+        // 显示提示
+        function showToast(text) {
+            const toast = document.getElementById('musicToast');
+            const toastText = document.getElementById('musicToastText');
+            toastText.textContent = text;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        // 返回上一页
+        function goBack() {
+            window.history.back();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
