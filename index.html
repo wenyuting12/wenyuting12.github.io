@@ -3290,6 +3290,103 @@
 		    from { opacity: 0; transform: translateY(10px); }
 		    to { opacity: 1; transform: translateY(0); }
 		}
+		
+		/* ===== 回复相关样式 ===== */
+		.reply-section {
+		    margin-top: 10px;
+		    padding-left: 52px;
+		}
+		
+		.reply-btn {
+		    font-size: 12px;
+		    color: #e9a4a4;
+		    background: rgba(233, 164, 164, 0.1);
+		    border: none;
+		    padding: 4px 12px;
+		    border-radius: 20px;
+		    cursor: pointer;
+		    margin-top: 5px;
+		}
+		
+		.reply-btn:hover {
+		    background: rgba(233, 164, 164, 0.2);
+		}
+		
+		.reply-list {
+		    margin-top: 10px;
+		    padding-left: 20px;
+		    border-left: 2px solid rgba(233, 164, 164, 0.2);
+		}
+		
+		.reply-item {
+		    background: rgba(255, 248, 245, 0.6);
+		    border-radius: 10px;
+		    padding: 10px;
+		    margin-bottom: 8px;
+		    font-size: 14px;
+		}
+		
+		.reply-header {
+		    display: flex;
+		    align-items: center;
+		    margin-bottom: 5px;
+		}
+		
+		.reply-avatar {
+		    width: 24px;
+		    height: 24px;
+		    border-radius: 50%;
+		    background: linear-gradient(135deg, #f5d0d0, #f0c0c0);
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    margin-right: 8px;
+		    font-size: 12px;
+		    color: white;
+		}
+		
+		.reply-name {
+		    font-weight: bold;
+		    color: #7a5e5e;
+		    font-size: 13px;
+		}
+		
+		.reply-time {
+		    font-size: 10px;
+		    color: #a78f8f;
+		    margin-left: 8px;
+		}
+		
+		.reply-content {
+		    color: #7a5e5e;
+		    font-size: 13px;
+		    padding-left: 32px;
+		}
+		
+		.view-more {
+		    text-align: center;
+		    padding: 15px;
+		    color: #e9a4a4;
+		    cursor: pointer;
+		    font-size: 14px;
+		}
+		
+		.view-more:hover {
+		    text-decoration: underline;
+		}
+		
+		.back-btn {
+		    text-align: center;
+		    padding: 15px;
+		    color: #e9a4a4;
+		    cursor: pointer;
+		    font-size: 14px;
+		    margin-top: 10px;
+		}
+		
+		.back-btn:hover {
+		    text-decoration: underline;
+		}
     </style>
 </head>
 <body>
@@ -3369,6 +3466,41 @@
                         return data.data;
                     } else {
                         throw new Error(data.msg || '保存失败');
+                    }
+                });
+            }
+    
+            // 保存回复到后端
+            function saveReply(parentId, replyData) {
+                // 获取token
+                const token = localStorage.getItem('token');
+                
+                // 构建请求头
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                // 如果有token，添加到请求头
+                if (token) {
+                    headers['Authorization'] = token;
+                    console.log('回复请求头添加token');
+                }
+                
+                return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(replyData)
+                })
+                .then(response => {
+                    console.log('回复响应状态:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('回复返回数据:', data);
+                    if (data.code === 200) {
+                        return data.data;
+                    } else {
+                        throw new Error(data.msg || '保存回复失败');
                     }
                 });
             }
@@ -3457,6 +3589,67 @@
                         showToast('发送失败，请稍后重试');
                     });
             }
+    
+            // 显示回复表单
+            function showReplyForm(parentId, parentName) {
+                const content = prompt(`回复 ${parentName}：`);
+                if (!content) return;
+                
+                const name = prompt('请输入你的名字：');
+                if (!name) return;
+                
+                // 获取用户ID
+                let userId = localStorage.getItem('userId');
+                if (!userId) {
+                    try {
+                        const userInfoStr = localStorage.getItem('userInfo');
+                        if (userInfoStr) {
+                            const userInfo = JSON.parse(userInfoStr);
+                            userId = userInfo.id || userInfo.userId;
+                        }
+                    } catch (e) {}
+                }
+                if (!userId) {
+                    const urlParams = getUrlParams();
+                    userId = urlParams.userId;
+                }
+                if (!userId) {
+                    userId = getCookie('userId');
+                }
+                
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    const continueAsGuest = confirm('未检测到登录信息，回复将以游客身份发送，是否继续？');
+                    if (!continueAsGuest) {
+                        return;
+                    }
+                }
+                
+                const replyData = {
+                    invitationId: currentInvitationId,
+                    userId: userId ? parseInt(userId) : null,
+                    guestName: name,
+                    content: content,
+                    relation: '回复',
+                    isPublic: 1,
+                    avatar: 'https://www.gravatar.com/avatar/default?d=mp'
+                };
+                
+                console.log('发送回复数据:', replyData);
+                
+                showToast('正在发送回复...');
+                
+                saveReply(parentId, replyData)
+                    .then(() => {
+                        loadBlessings();
+                        showToast('回复已发送');
+                    })
+                    .catch(error => {
+                        console.error('保存回复失败:', error);
+                        showToast('发送失败：' + error.message);
+                    });
+            }
 			
 			// 添加一个辅助函数来检查所有存储
 			function checkUserStorage() {
@@ -3507,17 +3700,30 @@
                     return;
                 }
                 
-                // 显示最新的3条
-                const recentBlessings = blessings.slice(-3).reverse();
+                // 分离主祝福和回复
+                const mainBlessings = blessings.filter(b => !b.parentId);
+                const replies = blessings.filter(b => b.parentId);
+                
+                // 按创建时间排序主祝福（最新的在前）
+                mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+                
+                // 只显示最新的5条
+                const recentBlessings = mainBlessings.slice(0, 5);
                 
                 let html = '';
                 recentBlessings.forEach(blessing => {
-                    // 生成随机颜色或使用关系对应的颜色
+                    // 移除内容中的HTML标签
+                    const plainContent = removeHtmlTags(blessing.content);
+                    
                     const avatarBg = getAvatarColor(blessing.relation);
                     const avatarText = getAvatarText(blessing.guestName);
                     
+                    // 获取这个祝福的所有回复
+                    const blessingReplies = replies.filter(r => r.parentId === blessing.id)
+                        .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
+                    
                     html += `
-                        <div class="blessing-item">
+                        <div class="blessing-item" id="blessing-${blessing.id}">
                             <div class="blessing-item-header">
                                 <div class="blessing-avatar" style="background: ${avatarBg}">${avatarText}</div>
                                 <div class="blessing-user-info">
@@ -3525,11 +3731,114 @@
                                     <span class="blessing-time">${formatTime(blessing.createTime)}</span>
                                 </div>
                             </div>
-                            <div class="blessing-content">${escapeHtml(blessing.content)}</div>
+                            <div class="blessing-content">${escapeHtml(plainContent)}</div>
                             ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
+                            
+                            <!-- 回复区域 -->
+                            <div class="reply-section">
+                                <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName)}')">
+                                    💬 回复
+                                </button>
+                                
+                                ${blessingReplies.length > 0 ? `
+                                    <div class="reply-list">
+                                        ${blessingReplies.map(reply => {
+                                            const replyPlainContent = removeHtmlTags(reply.content);
+                                            const replyAvatarBg = getAvatarColor(reply.relation);
+                                            const replyAvatarText = getAvatarText(reply.guestName);
+                                            return `
+                                                <div class="reply-item">
+                                                    <div class="reply-header">
+                                                        <div class="reply-avatar" style="background: ${replyAvatarBg}">${replyAvatarText}</div>
+                                                        <span class="reply-name">${escapeHtml(reply.guestName)}</span>
+                                                        <span class="reply-time">${formatTime(reply.createTime)}</span>
+                                                    </div>
+                                                    <div class="reply-content">${escapeHtml(replyPlainContent)}</div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     `;
                 });
+                
+                if (mainBlessings.length > 5) {
+                    html += `<div class="view-more" onclick="showAllBlessings()">查看更多祝福 (共${mainBlessings.length}条)...</div>`;
+                }
+                
+                blessingList.innerHTML = html;
+                if (countElement) countElement.textContent = `${blessings.length}条祝福`;
+            }
+    
+            // 显示所有祝福
+            function showAllBlessings() {
+                const blessingList = document.getElementById('blessingList');
+                const countElement = document.getElementById('blessingCount');
+                
+                // 分离主祝福和回复
+                const mainBlessings = blessings.filter(b => !b.parentId);
+                const replies = blessings.filter(b => b.parentId);
+                
+                // 按创建时间排序主祝福（最新的在前）
+                mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+                
+                let html = '';
+                mainBlessings.forEach(blessing => {
+                    // 移除内容中的HTML标签
+                    const plainContent = removeHtmlTags(blessing.content);
+                    
+                    const avatarBg = getAvatarColor(blessing.relation);
+                    const avatarText = getAvatarText(blessing.guestName);
+                    
+                    // 获取这个祝福的所有回复
+                    const blessingReplies = replies.filter(r => r.parentId === blessing.id)
+                        .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
+                    
+                    html += `
+                        <div class="blessing-item" id="blessing-${blessing.id}">
+                            <div class="blessing-item-header">
+                                <div class="blessing-avatar" style="background: ${avatarBg}">${avatarText}</div>
+                                <div class="blessing-user-info">
+                                    <span class="blessing-name">${escapeHtml(blessing.guestName)}</span>
+                                    <span class="blessing-time">${formatTime(blessing.createTime)}</span>
+                                </div>
+                            </div>
+                            <div class="blessing-content">${escapeHtml(plainContent)}</div>
+                            ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
+                            
+                            <!-- 回复区域 -->
+                            <div class="reply-section">
+                                <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName)}')">
+                                    💬 回复
+                                </button>
+                                
+                                ${blessingReplies.length > 0 ? `
+                                    <div class="reply-list">
+                                        ${blessingReplies.map(reply => {
+                                            const replyPlainContent = removeHtmlTags(reply.content);
+                                            const replyAvatarBg = getAvatarColor(reply.relation);
+                                            const replyAvatarText = getAvatarText(reply.guestName);
+                                            return `
+                                                <div class="reply-item">
+                                                    <div class="reply-header">
+                                                        <div class="reply-avatar" style="background: ${replyAvatarBg}">${replyAvatarText}</div>
+                                                        <span class="reply-name">${escapeHtml(reply.guestName)}</span>
+                                                        <span class="reply-time">${formatTime(reply.createTime)}</span>
+                                                    </div>
+                                                    <div class="reply-content">${escapeHtml(replyPlainContent)}</div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `<div class="back-btn" onclick="loadBlessings()">← 返回最新</div>`;
                 
                 blessingList.innerHTML = html;
                 if (countElement) countElement.textContent = `${blessings.length}条祝福`;
@@ -3542,7 +3851,8 @@
                     '同学': 'linear-gradient(135deg, #b8e2f2, #9ad0e8)',
                     '同事': 'linear-gradient(135deg, #c2e0c0, #a8d5a5)',
                     '长辈': 'linear-gradient(135deg, #e6c3a0, #d9b08c)',
-                    '闺蜜': 'linear-gradient(135deg, #f8b6c6, #f59eb0)'
+                    '闺蜜': 'linear-gradient(135deg, #f8b6c6, #f59eb0)',
+                    '回复': 'linear-gradient(135deg, #d3d3d3, #c0c0c0)'
                 };
                 return colors[relation] || 'linear-gradient(135deg, #d3d3d3, #c0c0c0)';
             }
@@ -3554,15 +3864,11 @@
                 return name.charAt(0);
             }
     
-            // 显示所有祝福（可改为弹出层或跳转到列表页）
-            function showAllBlessings() {
-                // 这里可以跳转到专门的祝福墙列表页
-                // 或者显示一个模态框
-                let message = '所有祝福：\n\n';
-                blessings.slice().reverse().forEach(b => {
-                    message += `${b.guestName}（${formatSimpleTime(b.createTime)}）：${b.content}\n`;
-                });
-                alert(message);
+            // 移除HTML标签的函数
+            function removeHtmlTags(html) {
+                if (!html) return '';
+                // 移除所有HTML标签
+                return html.replace(/<[^>]*>/g, '');
             }
     
             // 简单格式化时间
@@ -3570,15 +3876,6 @@
                 if (!timeString) return '';
                 const date = new Date(timeString);
                 return `${date.getMonth()+1}-${date.getDate()}`;
-            }
-    
-            // 显示所有祝福（兼容旧代码）
-            function showAllBlessings() {
-                let message = '所有祝福：\n\n';
-                blessings.slice().reverse().forEach(b => {
-                    message += `${b.guestName}：${b.content}\n`;
-                });
-                alert(message);
             }
 			
 			// 获取当前用户ID（统一入口）
@@ -3687,43 +3984,43 @@
     
             // 解析URL中的作品数据
             function parseWorkData() {
-                    const params = getUrlParams();
-                    
-                    // 如果有data参数（包含完整作品数据）
-                    if (params.data) {
-                        try {
-                            const workData = JSON.parse(params.data);
-                            console.log('解析到的作品数据:', workData);
+                const params = getUrlParams();
+                
+                // 如果有data参数（包含完整作品数据）
+                if (params.data) {
+                    try {
+                        const workData = JSON.parse(params.data);
+                        console.log('解析到的作品数据:', workData);
+                        
+                        // 如果作品数据中包含 userId，保存到 localStorage
+                        if (workData.userId) {
+                            localStorage.setItem('userId', workData.userId);
+                            console.log('从作品数据获取到userId:', workData.userId);
                             
-                            // 如果作品数据中包含 userId，保存到 localStorage
-                            if (workData.userId) {
-                                localStorage.setItem('userId', workData.userId);
-                                console.log('从作品数据获取到userId:', workData.userId);
-                                
-                                // 同时保存用户信息（如果有）
-                                const userInfo = {
-                                    id: workData.userId,
-                                    groomName: workData.groomName || '',
-                                    brideName: workData.brideName || ''
-                                };
-                                localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                            }
-                            
-                            return workData;
-                        } catch (e) {
-                            console.error('解析作品数据失败:', e);
+                            // 同时保存用户信息（如果有）
+                            const userInfo = {
+                                id: workData.userId,
+                                groomName: workData.groomName || '',
+                                brideName: workData.brideName || ''
+                            };
+                            localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
+                        
+                        return workData;
+                    } catch (e) {
+                        console.error('解析作品数据失败:', e);
                     }
-                    
-                    // 如果有id参数，可以从localStorage加载
-                    if (params.id) {
-                        try {
-                            const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
-                            return worksList.find(w => w.id == params.id);
-                        } catch (e) {
-                            console.error('从localStorage加载作品失败:', e);
-                        }
+                }
+                
+                // 如果有id参数，可以从localStorage加载
+                if (params.id) {
+                    try {
+                        const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
+                        return worksList.find(w => w.id == params.id);
+                    } catch (e) {
+                        console.error('从localStorage加载作品失败:', e);
                     }
+                }
                 
                 // 返回默认数据
                 return {
@@ -4220,7 +4517,7 @@
                             </div>
                         </div>
     					
-    					<!-- 祝福墙区域 -->
+    					<!-- 祝福墙区域 - 只在温柔花园模板中显示 -->
     					<div class="blessing-wall-section" id="blessingWallSection">
     					    <div class="blessing-header">
     					        <span class="blessing-title">✨ 祝 福 墙 ✨</span>
@@ -5242,7 +5539,7 @@
                 // 加载祝福墙数据
                 loadBlessings();
             }
-			
+    
             // 导航到地点
             function navigateToLocation(address) {
                 if (address) {
