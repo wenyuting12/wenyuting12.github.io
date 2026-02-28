@@ -3401,7 +3401,7 @@
     </div>
 
     <script>
-            // ===== 简化版祝福墙功能（后端关联版） =====
+            // ===== 完整祝福墙功能（所有模板通用） =====
             let blessings = [];
             let currentInvitationId = null;
 			const API_BASE_URL = 'http://localhost:8080';
@@ -3409,7 +3409,7 @@
             // 从后端加载祝福数据
             function loadBlessings() {
                 // 获取当前邀请函ID
-                currentInvitationId = currentWorkData?.invitationId || 1; // 从作品数据中获取邀请函ID
+                currentInvitationId = currentWorkData?.invitationId || 1;
                 
                 // 调用后端API获取祝福列表
                 fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}`)
@@ -3420,7 +3420,6 @@
                             renderBlessings();
                         } else {
                             console.error('加载祝福失败:', data.msg);
-                            // 使用空数据
                             blessings = [];
                             renderBlessings();
                         }
@@ -3435,33 +3434,21 @@
     
             // 保存祝福数据到后端
             function saveBlessing(blessing) {
-                // 获取token
                 const token = localStorage.getItem('token');
-                
-                // 构建请求头
                 const headers = {
                     'Content-Type': 'application/json',
                 };
-                
-                // 如果有token，添加到请求头
                 if (token) {
                     headers['Authorization'] = token;
-                    console.log('请求头添加token');
                 }
-                
-                console.log('发送祝福数据:', blessing);
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/add`, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify(blessing)
                 })
-                .then(response => {
-                    console.log('响应状态:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('响应数据:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
@@ -3472,18 +3459,12 @@
     
             // 保存回复到后端
             function saveReply(parentId, replyData) {
-                // 获取token
                 const token = localStorage.getItem('token');
-                
-                // 构建请求头
                 const headers = {
                     'Content-Type': 'application/json',
                 };
-                
-                // 如果有token，添加到请求头
                 if (token) {
                     headers['Authorization'] = token;
-                    console.log('回复请求头添加token');
                 }
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
@@ -3491,24 +3472,14 @@
                     headers: headers,
                     body: JSON.stringify(replyData)
                 })
-                .then(response => {
-                    console.log('回复响应状态:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('回复返回数据:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
                         throw new Error(data.msg || '保存回复失败');
                     }
                 });
-            }
-    
-            // 保存祝福数据（兼容旧代码）
-            function saveBlessings() {
-                // 这个函数不再使用，保留为空函数避免报错
-                console.log('saveBlessings已废弃，使用后端API');
             }
     
             // 显示祝福表单
@@ -3519,41 +3490,11 @@
                 const content = prompt('请输入你的祝福：');
                 if (!content) return;
                 
-                // 关系选择（可选）
                 const relation = prompt('请输入你的关系（亲友/同学/同事/长辈/闺蜜/其他，可留空）：') || '亲友';
                 
-                // 从localStorage获取用户ID（优先）
-                let userId = localStorage.getItem('userId');
-                console.log('从localStorage获取userId:', userId);
+                // 获取用户ID
+                let userId = getCurrentUserId();
                 
-                // 如果localStorage没有，从 userInfo 对象中获取
-                if (!userId) {
-                    try {
-                        const userInfoStr = localStorage.getItem('userInfo');
-                        if (userInfoStr) {
-                            const userInfo = JSON.parse(userInfoStr);
-                            userId = userInfo.id || userInfo.userId;
-                            console.log('从userInfo获取userId:', userId);
-                        }
-                    } catch (e) {
-                        console.error('解析userInfo失败:', e);
-                    }
-                }
-                
-                // 如果还没有，从URL参数获取
-                if (!userId) {
-                    const urlParams = getUrlParams();
-                    userId = urlParams.userId;
-                    console.log('从URL参数获取userId:', userId);
-                }
-                
-                // 如果还没有，从 cookie 获取（备选）
-                if (!userId) {
-                    userId = getCookie('userId');
-                    console.log('从cookie获取userId:', userId);
-                }
-                
-                // 如果没有userId，询问是否继续
                 if (!userId) {
                     const continueAsGuest = confirm('未检测到登录信息，是否以游客身份继续？');
                     if (!continueAsGuest) {
@@ -3561,26 +3502,20 @@
                     }
                 }
                 
-                // 构建祝福对象 - 确保包含 userId
                 const newBlessing = {
                     invitationId: currentInvitationId || 1,
-                    userId: userId ? parseInt(userId) : null, // 将userId转为数字，如果没有则为null
+                    userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
                     relation: relation,
-                    isPublic: 1, // 默认公开
+                    isPublic: 1,
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
                 
-                console.log('提交的祝福数据:', newBlessing);
-                
-                // 显示加载提示
                 showToast('正在发送祝福...');
                 
-                // 调用后端API保存
                 saveBlessing(newBlessing)
                     .then(savedBlessing => {
-                        // 重新加载列表以获取最新的数据（包括ID和时间）
                         loadBlessings();
                         showToast('祝福已发送');
                     })
@@ -3598,25 +3533,7 @@
                 const name = prompt('请输入你的名字：');
                 if (!name) return;
                 
-                // 获取用户ID
-                let userId = localStorage.getItem('userId');
-                if (!userId) {
-                    try {
-                        const userInfoStr = localStorage.getItem('userInfo');
-                        if (userInfoStr) {
-                            const userInfo = JSON.parse(userInfoStr);
-                            userId = userInfo.id || userInfo.userId;
-                        }
-                    } catch (e) {}
-                }
-                if (!userId) {
-                    const urlParams = getUrlParams();
-                    userId = urlParams.userId;
-                }
-                if (!userId) {
-                    userId = getCookie('userId');
-                }
-                
+                let userId = getCurrentUserId();
                 const token = localStorage.getItem('token');
                 
                 if (!token) {
@@ -3636,8 +3553,6 @@
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
                 
-                console.log('发送回复数据:', replyData);
-                
                 showToast('正在发送回复...');
                 
                 saveReply(parentId, replyData)
@@ -3651,14 +3566,10 @@
                     });
             }
 			
-			// 添加一个辅助函数来检查所有存储
+			// 检查所有存储
 			function checkUserStorage() {
 			    console.log('=== 检查所有存储 ===');
-			    
-			    // 检查 localStorage
 			    console.log('localStorage 中的所有keys:', Object.keys(localStorage));
-			    
-			    // 检查 userInfo
 			    try {
 			        const userInfo = localStorage.getItem('userInfo');
 			        console.log('userInfo原始值:', userInfo);
@@ -3668,23 +3579,16 @@
 			    } catch (e) {
 			        console.error('userInfo解析失败:', e);
 			    }
-			    
-			    // 检查 userId
 			    console.log('userId:', localStorage.getItem('userId'));
-			    
-			    // 检查 token
 			    console.log('token:', localStorage.getItem('token'));
-			    
-			    // 检查 cookies
 			    console.log('所有cookies:', document.cookie);
-			    
 			    console.log('=== 检查完成 ===');
 			}
 			
-			// 在页面加载时调用，帮助调试
+			// 在页面加载时调用
 			document.addEventListener('DOMContentLoaded', function() {
 			    initPage();
-			    checkUserStorage(); // 添加调试信息
+			    checkUserStorage();
 			});
     
             // 渲染祝福墙
@@ -3704,7 +3608,7 @@
                 const mainBlessings = blessings.filter(b => !b.parentId);
                 const replies = blessings.filter(b => b.parentId);
                 
-                // 按创建时间排序主祝福（最新的在前）
+                // 按创建时间排序主祝福
                 mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
                 
                 // 只显示最新的5条
@@ -3712,13 +3616,10 @@
                 
                 let html = '';
                 recentBlessings.forEach(blessing => {
-                    // 移除内容中的HTML标签
                     const plainContent = removeHtmlTags(blessing.content);
-                    
                     const avatarBg = getAvatarColor(blessing.relation);
                     const avatarText = getAvatarText(blessing.guestName);
                     
-                    // 获取这个祝福的所有回复
                     const blessingReplies = replies.filter(r => r.parentId === blessing.id)
                         .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
                     
@@ -3734,7 +3635,6 @@
                             <div class="blessing-content">${escapeHtml(plainContent)}</div>
                             ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
                             
-                            <!-- 回复区域 -->
                             <div class="reply-section">
                                 <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName)}')">
                                     💬 回复
@@ -3777,22 +3677,17 @@
                 const blessingList = document.getElementById('blessingList');
                 const countElement = document.getElementById('blessingCount');
                 
-                // 分离主祝福和回复
                 const mainBlessings = blessings.filter(b => !b.parentId);
                 const replies = blessings.filter(b => b.parentId);
                 
-                // 按创建时间排序主祝福（最新的在前）
                 mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
                 
                 let html = '';
                 mainBlessings.forEach(blessing => {
-                    // 移除内容中的HTML标签
                     const plainContent = removeHtmlTags(blessing.content);
-                    
                     const avatarBg = getAvatarColor(blessing.relation);
                     const avatarText = getAvatarText(blessing.guestName);
                     
-                    // 获取这个祝福的所有回复
                     const blessingReplies = replies.filter(r => r.parentId === blessing.id)
                         .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
                     
@@ -3808,7 +3703,6 @@
                             <div class="blessing-content">${escapeHtml(plainContent)}</div>
                             ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
                             
-                            <!-- 回复区域 -->
                             <div class="reply-section">
                                 <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName)}')">
                                     💬 回复
@@ -3860,36 +3754,32 @@
             // 获取头像文字
             function getAvatarText(name) {
                 if (!name) return '👤';
-                // 取第一个字
                 return name.charAt(0);
             }
     
-            // 移除HTML标签的函数
+            // 移除HTML标签
             function removeHtmlTags(html) {
                 if (!html) return '';
-                // 移除所有HTML标签
                 return html.replace(/<[^>]*>/g, '');
             }
     
-            // 简单格式化时间
+            // 格式化简单时间
             function formatSimpleTime(timeString) {
                 if (!timeString) return '';
                 const date = new Date(timeString);
                 return `${date.getMonth()+1}-${date.getDate()}`;
             }
 			
-			// 获取当前用户ID（统一入口）
+			// 获取当前用户ID
 			function getCurrentUserId() {
 			    let userId = null;
 			    
-			    // 1. 从localStorage获取（优先）
 			    userId = localStorage.getItem('userId');
 			    if (userId) {
 			        console.log('从localStorage获取userId:', userId);
 			        return userId;
 			    }
 			    
-			    // 2. 从 userInfo 对象中获取
 			    try {
 			        const userInfoStr = localStorage.getItem('userInfo');
 			        if (userInfoStr) {
@@ -3904,17 +3794,14 @@
 			        console.error('解析userInfo失败:', e);
 			    }
 			    
-			    // 3. 从URL参数获取
 			    const urlParams = getUrlParams();
 			    userId = urlParams.userId;
 			    if (userId) {
 			        console.log('从URL参数获取userId:', userId);
-			        // 保存到localStorage以便后续使用
 			        localStorage.setItem('userId', userId);
 			        return userId;
 			    }
 			    
-			    // 4. 从作品数据中获取
 			    if (urlParams.data) {
 			        try {
 			            const workData = JSON.parse(urlParams.data);
@@ -3929,7 +3816,6 @@
 			        }
 			    }
 			    
-			    // 5. 从 cookie 获取（备选）
 			    userId = getCookie('userId');
 			    if (userId) {
 			        console.log('从cookie获取userId:', userId);
@@ -3941,9 +3827,19 @@
 			    return null;
 			}
     
-            // 修改 showMessageBox 函数
+            // 显示留言弹窗
             function showMessageBox() {
                 showBlessingForm();
+            }
+    
+            // 显示礼物弹窗
+            function showGiftBox() {
+                showToast('感谢您的祝福');
+            }
+    
+            // 点赞
+            function likePage() {
+                showToast('感谢您的点赞');
             }
     
             // 转义HTML
@@ -3986,18 +3882,15 @@
             function parseWorkData() {
                 const params = getUrlParams();
                 
-                // 如果有data参数（包含完整作品数据）
                 if (params.data) {
                     try {
                         const workData = JSON.parse(params.data);
                         console.log('解析到的作品数据:', workData);
                         
-                        // 如果作品数据中包含 userId，保存到 localStorage
                         if (workData.userId) {
                             localStorage.setItem('userId', workData.userId);
                             console.log('从作品数据获取到userId:', workData.userId);
                             
-                            // 同时保存用户信息（如果有）
                             const userInfo = {
                                 id: workData.userId,
                                 groomName: workData.groomName || '',
@@ -4012,7 +3905,6 @@
                     }
                 }
                 
-                // 如果有id参数，可以从localStorage加载
                 if (params.id) {
                     try {
                         const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
@@ -4022,10 +3914,9 @@
                     }
                 }
                 
-                // 返回默认数据
                 return {
                     templateId: 1,
-                    invitationId: 1, // 添加默认邀请函ID
+                    invitationId: 1,
                     groomName: '子轩',
                     brideName: '雨桐',
                     weddingDate: '2027-09-14',
@@ -4146,6 +4037,26 @@
                     4: '海岛度假'
                 };
                 return names[templateId] || '邀请函';
+            }
+    
+            // ========== 模板渲染函数 ==========
+            
+            // 通用祝福墙HTML代码
+            function getBlessingWallHTML() {
+                return `
+                    <div class="blessing-wall-section" id="blessingWallSection">
+                        <div class="blessing-header">
+                            <span class="blessing-title">✨ 祝 福 墙 ✨</span>
+                            <span class="blessing-count" id="blessingCount">0条祝福</span>
+                            <span class="view-all-btn" onclick="showAllBlessings()">查看全部 ›</span>
+                        </div>
+                        <div class="blessing-list" id="blessingList"></div>
+                        <button class="write-blessing-btn" onclick="showBlessingForm()">
+                            <span class="write-icon">✍️</span>
+                            <span>写下祝福</span>
+                        </button>
+                    </div>
+                `;
             }
     
             // 生成温柔花园模板HTML
@@ -4517,25 +4428,8 @@
                             </div>
                         </div>
     					
-    					<!-- 祝福墙区域 - 只在温柔花园模板中显示 -->
-    					<div class="blessing-wall-section" id="blessingWallSection">
-    					    <div class="blessing-header">
-    					        <span class="blessing-title">✨ 祝 福 墙 ✨</span>
-    					        <span class="blessing-count" id="blessingCount">0条祝福</span>
-    					        <span class="view-all-btn" onclick="showAllBlessings()">查看全部 ›</span>
-    					    </div>
-    					    
-    					    <!-- 祝福列表 -->
-    					    <div class="blessing-list" id="blessingList">
-    					        <!-- 这里会动态显示祝福 -->
-    					    </div>
-    					    
-    					    <!-- 写祝福按钮 -->
-    					    <button class="write-blessing-btn" onclick="showBlessingForm()">
-    					        <span class="write-icon">✍️</span>
-    					        <span>写下祝福</span>
-    					    </button>
-    					</div>
+    					<!-- 祝福墙区域 - 所有模板都有 -->
+    					${getBlessingWallHTML()}
                     </div>
                 `;
             }
@@ -4558,7 +4452,7 @@
                                     <span class="wedding-time">${data.weddingTime || '16:30'}</span>
                                 </div>
                                 <div class="minimal-line"></div>
-                                <span class="short-quote">${data.vowsText || '想和你一起，慢慢变老'}</span>
+                                <span class="short-quote">${data.shortQuote || '想和你一起，慢慢变老'}</span>
                             </div>
                             <div class="scroll-indicator">
                                 <span class="scroll-text">往下滑动</span>
@@ -4888,6 +4782,9 @@
                                 <span>${data.copyrightText || '陈述 & 林诗意 · 邀请函'}</span>
                             </div>
                         </div>
+                        
+                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        ${getBlessingWallHTML()}
                     </div>
                 `;
             }
@@ -5171,6 +5068,9 @@
                                 <span>${data.copyrightChinese || '张逸轩 & 李婉晴 · 中式婚礼'}</span>
                             </div>
                         </div>
+                        
+                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        ${getBlessingWallHTML()}
                     </div>
                 `;
             }
@@ -5448,6 +5348,9 @@
                                 <span>${data.copyrightIsland || '一帆 & 浅夏 · 海岛婚礼'}</span>
                             </div>
                         </div>
+                        
+                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        ${getBlessingWallHTML()}
                     </div>
                 `;
             }
@@ -5465,21 +5368,17 @@
     
             // 初始化页面
             function initPage() {
-                // 先从URL参数中尝试获取用户ID
                 const urlParams = getUrlParams();
                 
-                // 如果有data参数（包含作品数据）
                 if (urlParams.data) {
                     try {
                         const workData = JSON.parse(urlParams.data);
                         currentWorkData = workData;
                         
-                        // 如果作品数据中包含 userId，保存到 localStorage
                         if (workData.userId) {
                             localStorage.setItem('userId', workData.userId);
                             console.log('从作品数据获取到userId:', workData.userId);
                             
-                            // 同时保存用户信息（如果有）
                             const userInfo = {
                                 id: workData.userId,
                                 groomName: workData.groomName || '',
@@ -5489,22 +5388,18 @@
                         }
                     } catch (e) {
                         console.error('解析作品数据失败:', e);
-                        currentWorkData = parseWorkData(); // 使用默认数据
+                        currentWorkData = parseWorkData();
                     }
                 } else {
-                    // 没有data参数，使用默认数据
                     currentWorkData = parseWorkData();
                 }
                 
-                // 如果URL中有单独的userId参数（备用）
                 if (urlParams.userId && !localStorage.getItem('userId')) {
                     localStorage.setItem('userId', urlParams.userId);
                     console.log('从URL参数获取到userId:', urlParams.userId);
                 }
                 
                 const templateId = currentWorkData.templateId || 1;
-                
-                // 获取邀请函ID（可以从URL参数或作品数据中获取）
                 currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
                 
                 let html = '';
@@ -5526,17 +5421,13 @@
                 }
                 
                 document.getElementById('template-container').innerHTML = html;
-                
-                // 更新页面标题
                 document.title = getTemplateName(templateId) + '邀请函';
                 
-                // 初始化计数器
                 guestCount = parseInt(currentWorkData.defaultGuests) || 1;
                 modernGuestCount = parseInt(currentWorkData.defaultGuests2) || 2;
                 chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
                 islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
                 
-                // 加载祝福墙数据
                 loadBlessings();
             }
     
@@ -5694,21 +5585,6 @@
                 }
             }
     
-            // 显示留言弹窗
-            function showMessageBox() {
-                showBlessingForm();
-            }
-    
-            // 显示礼物弹窗
-            function showGiftBox() {
-                showToast('感谢您的祝福');
-            }
-    
-            // 点赞
-            function likePage() {
-                showToast('感谢您的点赞');
-            }
-    
             // 分享页面
             function sharePage() {
                 if (navigator.share) {
@@ -5751,9 +5627,6 @@
             function goBack() {
                 window.history.back();
             }
-    
-            // 页面加载完成后初始化
-            document.addEventListener('DOMContentLoaded', initPage);
 			
 			function getCookie(name) {
 			    const value = `; ${document.cookie}`;
