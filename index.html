@@ -3404,15 +3404,17 @@
             // ===== 完整祝福墙功能（所有模板通用） =====
             let blessings = [];
             let currentInvitationId = null;
+			let currentTemplateId = null; // 新增：当前模板ID
 			const API_BASE_URL = 'http://localhost:8080';
     
             // 从后端加载祝福数据
             function loadBlessings() {
-                // 获取当前邀请函ID
+                // 获取当前邀请函ID和模板ID
                 currentInvitationId = currentWorkData?.invitationId || 1;
+                currentTemplateId = currentWorkData?.templateId || 1;
                 
-                // 调用后端API获取祝福列表
-                fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}`)
+                // 调用后端API获取祝福列表，传递模板ID参数
+                fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}?templateId=${currentTemplateId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.code === 200) {
@@ -3433,6 +3435,7 @@
             }
     
             // 保存祝福数据到后端
+            // 保存祝福数据到后端（包含模板ID）
             function saveBlessing(blessing) {
                 const token = localStorage.getItem('token');
                 const headers = {
@@ -3441,6 +3444,9 @@
                 if (token) {
                     headers['Authorization'] = token;
                 }
+                
+                // 确保祝福对象包含模板ID
+                blessing.templateId = currentTemplateId;
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/add`, {
                     method: 'POST',
@@ -3466,6 +3472,9 @@
                 if (token) {
                     headers['Authorization'] = token;
                 }
+                
+                // 确保回复数据包含模板ID
+                replyData.templateId = currentTemplateId;
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
                     method: 'POST',
@@ -3504,6 +3513,7 @@
                 
                 const newBlessing = {
                     invitationId: currentInvitationId || 1,
+                    templateId: currentTemplateId, // 添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3545,6 +3555,7 @@
                 
                 const replyData = {
                     invitationId: currentInvitationId,
+                    templateId: currentTemplateId, // 添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
