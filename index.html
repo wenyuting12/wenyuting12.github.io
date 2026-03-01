@@ -3401,20 +3401,38 @@
     </div>
 
     <script>
-            // ===== 完整祝福墙功能（所有模板通用） =====
+            // ===== 完整祝福墙功能（所有模板通用，支持模板ID识别） =====
             let blessings = [];
             let currentInvitationId = null;
-			let currentTemplateId = null; // 新增：当前模板ID
+            let currentTemplateId = 1; // 默认模板ID
 			const API_BASE_URL = 'http://localhost:8080';
     
-            // 从后端加载祝福数据
+            // 从后端加载祝福数据（按模板ID和邀请函ID）
             function loadBlessings() {
-                // 获取当前邀请函ID和模板ID
-                currentInvitationId = currentWorkData?.invitationId || 1;
+                // 获取当前模板ID
                 currentTemplateId = currentWorkData?.templateId || 1;
                 
-                // 调用后端API获取祝福列表，传递模板ID参数
-                fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}?templateId=${currentTemplateId}`)
+                // 确保获取正确的邀请函ID - 修复：从多个来源获取invitationId
+                let invitationId = currentWorkData?.invitationId;
+                
+                // 如果workData中没有，尝试从URL参数获取
+                if (!invitationId) {
+                    const urlParams = getUrlParams();
+                    invitationId = urlParams.invitationId;
+                }
+                
+                // 如果还是没有，使用默认值
+                if (!invitationId) {
+                    invitationId = currentInvitationId || 1;
+                }
+                
+                // 保存到全局变量，供其他地方使用
+                currentInvitationId = invitationId;
+                
+                console.log('加载祝福 - 邀请函ID:', invitationId, '模板ID:', currentTemplateId);
+                
+                // 调用后端API获取祝福列表（按模板ID和邀请函ID）
+                fetch(`${API_BASE_URL}/wall/wall/public/template/${currentTemplateId}?invitationId=${invitationId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.code === 200) {
@@ -3435,7 +3453,6 @@
             }
     
             // 保存祝福数据到后端
-            // 保存祝福数据到后端（包含模板ID）
             function saveBlessing(blessing) {
                 const token = localStorage.getItem('token');
                 const headers = {
@@ -3445,8 +3462,34 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保祝福对象包含模板ID
-                blessing.templateId = currentTemplateId;
+                // 确保包含 templateId 和 invitationId
+                if (!blessing.templateId && currentWorkData) {
+                    blessing.templateId = currentWorkData.templateId || 1;
+                }
+                
+                // 确保 invitationId 正确 - 修复：使用当前有效的邀请函ID
+                if (!blessing.invitationId) {
+                    // 从多个来源获取 invitationId
+                    let invitationId = currentWorkData?.invitationId || currentInvitationId;
+                    
+                    // 如果还是没有，从URL参数获取
+                    if (!invitationId) {
+                        const urlParams = getUrlParams();
+                        invitationId = urlParams.invitationId;
+                    }
+                    
+                    // 默认值
+                    if (!invitationId) {
+                        invitationId = 1;
+                    }
+                    
+                    blessing.invitationId = invitationId;
+                    
+                    // 更新全局变量
+                    currentInvitationId = invitationId;
+                }
+                
+                console.log('发送祝福数据:', blessing);
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/add`, {
                     method: 'POST',
@@ -3455,6 +3498,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log('响应数据:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
@@ -3473,8 +3517,32 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保回复数据包含模板ID
-                replyData.templateId = currentTemplateId;
+                // 确保包含 templateId 和 invitationId
+                if (!replyData.templateId && currentWorkData) {
+                    replyData.templateId = currentWorkData.templateId || 1;
+                }
+                
+                // 确保 invitationId 正确 - 修复：使用当前有效的邀请函ID
+                if (!replyData.invitationId) {
+                    // 从多个来源获取 invitationId
+                    let invitationId = currentWorkData?.invitationId || currentInvitationId;
+                    
+                    // 如果还是没有，从URL参数获取
+                    if (!invitationId) {
+                        const urlParams = getUrlParams();
+                        invitationId = urlParams.invitationId;
+                    }
+                    
+                    // 默认值
+                    if (!invitationId) {
+                        invitationId = 1;
+                    }
+                    
+                    replyData.invitationId = invitationId;
+                    
+                    // 更新全局变量
+                    currentInvitationId = invitationId;
+                }
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
                     method: 'POST',
@@ -3511,9 +3579,29 @@
                     }
                 }
                 
+                // 获取当前模板ID
+                const templateId = currentWorkData?.templateId || 1;
+                
+                // 获取邀请函ID - 修复：从多个来源获取
+                let invitationId = currentWorkData?.invitationId || currentInvitationId;
+                
+                // 如果还是没有，从URL参数获取
+                if (!invitationId) {
+                    const urlParams = getUrlParams();
+                    invitationId = urlParams.invitationId;
+                }
+                
+                // 默认值
+                if (!invitationId) {
+                    invitationId = 1;
+                }
+                
+                // 更新全局变量
+                currentInvitationId = invitationId;
+                
                 const newBlessing = {
-                    invitationId: currentInvitationId || 1,
-                    templateId: currentTemplateId, // 添加模板ID
+                    invitationId: invitationId,
+                    templateId: templateId, // 关键：添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3521,6 +3609,8 @@
                     isPublic: 1,
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
+                
+                console.log('提交的祝福数据:', newBlessing);
                 
                 showToast('正在发送祝福...');
                 
@@ -3553,9 +3643,29 @@
                     }
                 }
                 
+                // 获取当前模板ID
+                const templateId = currentWorkData?.templateId || 1;
+                
+                // 获取邀请函ID - 修复：从多个来源获取
+                let invitationId = currentWorkData?.invitationId || currentInvitationId;
+                
+                // 如果还是没有，从URL参数获取
+                if (!invitationId) {
+                    const urlParams = getUrlParams();
+                    invitationId = urlParams.invitationId;
+                }
+                
+                // 默认值
+                if (!invitationId) {
+                    invitationId = 1;
+                }
+                
+                // 更新全局变量
+                currentInvitationId = invitationId;
+                
                 const replyData = {
-                    invitationId: currentInvitationId,
-                    templateId: currentTemplateId, // 添加模板ID
+                    invitationId: invitationId,
+                    templateId: templateId, // 关键：添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3563,6 +3673,8 @@
                     isPublic: 1,
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
+                
+                console.log('发送回复数据:', replyData);
                 
                 showToast('正在发送回复...');
                 
@@ -3608,6 +3720,13 @@
                 const countElement = document.getElementById('blessingCount');
                 
                 if (!blessingList) return;
+                
+                // 获取当前模板名称并更新标题
+                const templateName = getTemplateName(currentWorkData?.templateId || 1);
+                const blessingTitle = document.querySelector('.blessing-title');
+                if (blessingTitle) {
+                    blessingTitle.textContent = `✨ ${templateName} · 祝 福 墙 ✨`;
+                }
                 
                 if (blessings.length === 0) {
                     blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
@@ -3910,6 +4029,16 @@
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
                         
+                        // 确保有 templateId
+                        if (!workData.templateId) {
+                            workData.templateId = 1;
+                        }
+                        
+                        // 确保有 invitationId - 修复：从URL参数获取或保留原有的
+                        if (!workData.invitationId && params.invitationId) {
+                            workData.invitationId = parseInt(params.invitationId);
+                        }
+                        
                         return workData;
                     } catch (e) {
                         console.error('解析作品数据失败:', e);
@@ -3925,9 +4054,10 @@
                     }
                 }
                 
+                // 返回默认数据，包含 templateId 和 invitationId
                 return {
                     templateId: 1,
-                    invitationId: 1,
+                    invitationId: params.invitationId ? parseInt(params.invitationId) : 1,
                     groomName: '子轩',
                     brideName: '雨桐',
                     weddingDate: '2027-09-14',
@@ -4439,7 +4569,7 @@
                             </div>
                         </div>
     					
-    					<!-- 祝福墙区域 - 所有模板都有 -->
+    					<!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
     					${getBlessingWallHTML()}
                     </div>
                 `;
@@ -4794,7 +4924,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5080,7 +5210,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5360,7 +5490,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有 -->
+                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5397,6 +5527,19 @@
                             };
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
+                        
+                        // 确保有 templateId
+                        if (!workData.templateId) {
+                            workData.templateId = 1;
+                        }
+                        
+                        // 确保有 invitationId - 修复：从URL参数获取或保留原有的
+                        if (!workData.invitationId && urlParams.invitationId) {
+                            workData.invitationId = parseInt(urlParams.invitationId);
+                        }
+                        
+                        currentTemplateId = workData.templateId;
+                        
                     } catch (e) {
                         console.error('解析作品数据失败:', e);
                         currentWorkData = parseWorkData();
@@ -5411,7 +5554,12 @@
                 }
                 
                 const templateId = currentWorkData.templateId || 1;
+                
+                // 修复：正确获取 invitationId
                 currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
+                currentTemplateId = templateId;
+                
+                console.log('初始化完成 - 邀请函ID:', currentInvitationId, '模板ID:', currentTemplateId);
                 
                 let html = '';
                 switch(templateId) {
@@ -5439,6 +5587,7 @@
                 chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
                 islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
                 
+                // 加载对应模板的祝福数据
                 loadBlessings();
             }
     
