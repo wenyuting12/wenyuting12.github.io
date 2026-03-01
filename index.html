@@ -3553,65 +3553,78 @@
     
             // 显示祝福表单
             function showBlessingForm() {
-                const name = prompt('请输入你的名字：');
-                if (!name) return;
-                
-                const content = prompt('请输入你的祝福：');
-                if (!content) return;
-                
-                const relation = prompt('请输入你的关系（亲友/同学/同事/长辈/闺蜜/其他，可留空）：') || '亲友';
-                
-                // 获取用户ID
-                let userId = getCurrentUserId();
-                
-                if (!userId) {
-                    const continueAsGuest = confirm('未检测到登录信息，是否以游客身份继续？');
-                    if (!continueAsGuest) {
-                        return;
-                    }
-                }
-                
-                // 获取邀请函ID - 修复：从多个来源获取
-                let invitationId = currentWorkData?.invitationId || currentInvitationId;
-                
-                // 如果还是没有，从URL参数获取
-                if (!invitationId) {
-                    const urlParams = getUrlParams();
-                    invitationId = urlParams.invitationId;
-                }
-                
-                // 默认值
-                if (!invitationId) {
-                    invitationId = 1;
-                }
-                
-                // 更新全局变量
-                currentInvitationId = invitationId;
-                
-                const newBlessing = {
-                    invitationId: parseInt(invitationId), // 确保是数字类型
-                    userId: userId ? parseInt(userId) : null,
-                    guestName: name,
-                    content: content,
-                    relation: relation,
-                    isPublic: 1,
-                    avatar: 'https://www.gravatar.com/avatar/default?d=mp'
-                };
-                
-                console.log('提交的祝福数据:', newBlessing);
-                
-                showToast('正在发送祝福...');
-                
-                saveBlessing(newBlessing)
-                    .then(savedBlessing => {
-                        loadBlessings();
-                        showToast('祝福已发送');
-                    })
-                    .catch(error => {
-                        console.error('保存祝福失败:', error);
-                        showToast('发送失败，请稍后重试');
-                    });
-            }
+    const name = prompt('请输入你的名字：');
+    if (!name) return;
+    
+    const content = prompt('请输入你的祝福：');
+    if (!content) return;
+    
+    const relation = prompt('请输入你的关系（亲友/同学/同事/长辈/闺蜜/其他，可留空）：') || '亲友';
+    
+    // 获取用户ID
+    let userId = getCurrentUserId();
+    
+    if (!userId) {
+        const continueAsGuest = confirm('未检测到登录信息，是否以游客身份继续？');
+        if (!continueAsGuest) {
+            return;
+        }
+    }
+    
+    // 关键修复：优先使用 currentInvitationId
+    let invitationId = currentInvitationId;
+    
+    // 如果 currentInvitationId 不存在，尝试从其他来源获取
+    if (!invitationId) {
+        invitationId = currentWorkData?.invitationId;
+    }
+    
+    if (!invitationId) {
+        const urlParams = getUrlParams();
+        invitationId = urlParams.invitationId;
+    }
+    
+    if (!invitationId) {
+        // 尝试从作品数据中的 id 字段获取
+        if (currentWorkData?.id) {
+            invitationId = currentWorkData.id;
+        }
+    }
+    
+    // 默认值
+    if (!invitationId) {
+        invitationId = 1;
+        console.warn('未找到邀请函ID，使用默认值: 1');
+    }
+    
+    // 更新全局变量
+    currentInvitationId = parseInt(invitationId);
+    
+    const newBlessing = {
+        invitationId: parseInt(invitationId), // 确保是数字类型
+        userId: userId ? parseInt(userId) : null,
+        guestName: name,
+        content: content,
+        relation: relation,
+        isPublic: 1,
+        avatar: 'https://www.gravatar.com/avatar/default?d=mp'
+    };
+    
+    console.log('提交的祝福数据 - 邀请函ID:', invitationId, '用户ID:', userId);
+    console.log('完整祝福数据:', newBlessing);
+    
+    showToast('正在发送祝福...');
+    
+    saveBlessing(newBlessing)
+        .then(savedBlessing => {
+            loadBlessings();
+            showToast('祝福已发送');
+        })
+        .catch(error => {
+            console.error('保存祝福失败:', error);
+            showToast('发送失败，请稍后重试');
+        });
+}
     
             // 显示回复表单
             function showReplyForm(parentId, parentName) {
@@ -4138,121 +4151,146 @@ function showAllBlessings() {
                 return params;
             }
     
-            // 解析URL中的作品数据
-            function parseWorkData() {
-                const params = getUrlParams();
+            // 修改 parseWorkData 函数，确保正确提取 invitationId
+function parseWorkData() {
+    const params = getUrlParams();
+    
+    if (params.data) {
+        try {
+            const workData = JSON.parse(params.data);
+            console.log('解析到的作品数据:', workData);
+            
+            if (workData.userId) {
+                localStorage.setItem('userId', workData.userId);
+                console.log('从作品数据获取到userId:', workData.userId);
                 
-                if (params.data) {
-                    try {
-                        const workData = JSON.parse(params.data);
-                        console.log('解析到的作品数据:', workData);
-                        
-                        if (workData.userId) {
-                            localStorage.setItem('userId', workData.userId);
-                            console.log('从作品数据获取到userId:', workData.userId);
-                            
-                            const userInfo = {
-                                id: workData.userId,
-                                groomName: workData.groomName || '',
-                                brideName: workData.brideName || ''
-                            };
-                            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                        }
-                        
-                        // 确保有 templateId（仅用于显示）
-                        if (!workData.templateId) {
-                            workData.templateId = 1;
-                        }
-                        
-                        // 确保有 invitationId
-                        if (!workData.invitationId && params.invitationId) {
-                            workData.invitationId = parseInt(params.invitationId);
-                        }
-                        
-                        return workData;
-                    } catch (e) {
-                        console.error('解析作品数据失败:', e);
-                    }
-                }
-                
-                if (params.id) {
-                    try {
-                        const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
-                        return worksList.find(w => w.id == params.id);
-                    } catch (e) {
-                        console.error('从localStorage加载作品失败:', e);
-                    }
-                }
-                
-                // 返回默认数据，包含 invitationId
-                return {
-                    templateId: 1,
-                    invitationId: params.invitationId ? parseInt(params.invitationId) : 1,
-                    groomName: '子轩',
-                    brideName: '雨桐',
-                    weddingDate: '2027-09-14',
-                    weddingTime: '农历四月廿二 12:00',
-                    weddingAddress: '婚贝大酒店A栋9F',
-                    declaration: '遇见你，是我最美的意外',
-                    declaration2: '我们决定携手共赴爱之新途',
-                    quote1: '诚挚邀请最挚爱的亲友',
-                    quote2: '来一场关于爱的旅行',
-                    quote3: '见证我们爱的启程',
-                    poemTitle: '不早不晚',
-                    poemLine1: '当我拥你入怀',
-                    poemLine2: '我便拥有了一切',
-                    poemLine3: '沙子，时间，雨树',
-                    poemLine4: '万物生机勃勃',
-                    poemLine5: '在你的生命中我看到一切生命',
-                    loveDefinition1: '爱，让我和你，变成了我们',
-                    loveDefinition2: '让所有的「今天」',
-                    loveDefinition3: '变成了「最好的一天」',
-                    loveDefinition4: '我们有的是以后',
-                    softQuote1: '你不是爱情的终点',
-                    softQuote2: '只是爱情的原动力',
-                    softQuote3: '我将这爱情献给路旁的花朵',
-                    softQuote4: '献给教堂的红色圆顶',
-                    softQuote5: '因为你，我爱上了这个世界',
-                    countdownText1: '你说最好的人会到身边',
-                    countdownText2: '此刻我也这样想',
-                    days: '127',
-                    hours: '8',
-                    minutes: '24',
-                    seconds: '36',
-                    welcomeTitle: '欢迎',
-                    welcomeSubtitle: '我们的婚礼',
-                    welcomeLine1: '本着结婚对于我们来说是',
-                    welcomeLine2: '开心和重要的事儿',
-                    welcomeLine3: '希望各位朋友能够一起见证',
-                    welcomeLine4: '这份开心',
-                    placeName: '山里·山涧溪谷',
-                    placeTag1: '凤凰山',
-                    placeTag2: '涵碧楼酒店',
-                    navAddress: '凤凰山风景区',
-                    gentleWord1: '漫长人生零零碎碎',
-                    gentleWord2: '普通又温暖',
-                    gentleWord3: '我用最浪漫的方式登场',
-                    rsvpTitle: '婚礼回执',
-                    namePlaceholder: '请输入您的姓名',
-                    defaultGuests: '1',
-                    rsvpButton: '发送',
-                    giftWord1: '生命中有有的人',
-                    giftWord2: '是像礼物一般的存在',
-                    giftWord3: '是一想到就觉得',
-                    giftWord4: '心底忽而亮堂',
-                    giftLine1: '而你，于我而言',
-                    giftLine2: '便是这样的存在',
-                    giftTitle: '祝福礼物',
-                    giftNote1: '礼物金额实时转入',
-                    giftNote2: '制作人婚贝账户',
-                    actionName1: '祝福留言',
-                    actionName2: '烟火贺喜',
-                    actionName3: '永结同心',
-                    statNumber: '99',
-                    statLabel: '祝福留言 · 烟火贺喜 · 永结同心',
-                    infoText: '9图 | 20.07w人喜欢'
+                const userInfo = {
+                    id: workData.userId,
+                    groomName: workData.groomName || '',
+                    brideName: workData.brideName || ''
                 };
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
             }
+            
+            // 确保有 templateId（仅用于显示）
+            if (!workData.templateId) {
+                workData.templateId = 1;
+            }
+            
+            // 关键修复：从作品数据中获取 invitationId
+            // 作品数据中可能包含 id 或 invitationId 字段
+            if (!workData.invitationId) {
+                // 如果作品数据中有 id 字段，将其作为 invitationId
+                if (workData.id) {
+                    workData.invitationId = parseInt(workData.id);
+                    console.log('从作品数据id字段设置invitationId:', workData.invitationId);
+                } 
+                // 如果URL参数中有 invitationId，优先使用
+                else if (params.invitationId) {
+                    workData.invitationId = parseInt(params.invitationId);
+                    console.log('从URL参数设置invitationId:', workData.invitationId);
+                }
+                // 默认值
+                else {
+                    workData.invitationId = 1;
+                    console.log('使用默认invitationId: 1');
+                }
+            } else {
+                console.log('作品数据已有invitationId:', workData.invitationId);
+            }
+            
+            return workData;
+        } catch (e) {
+            console.error('解析作品数据失败:', e);
+        }
+    }
+    
+    if (params.id) {
+        try {
+            const worksList = JSON.parse(localStorage.getItem('worksList') || '[]');
+            const workData = worksList.find(w => w.id == params.id);
+            if (workData) {
+                // 确保有 invitationId
+                if (!workData.invitationId && workData.id) {
+                    workData.invitationId = parseInt(workData.id);
+                }
+            }
+            return workData;
+        } catch (e) {
+            console.error('从localStorage加载作品失败:', e);
+        }
+    }
+    
+    // 返回默认数据，从URL参数获取 invitationId
+    return {
+        templateId: 1,
+        invitationId: params.invitationId ? parseInt(params.invitationId) : 1,
+        groomName: '子轩',
+        brideName: '雨桐',
+        weddingDate: '2027-09-14',
+        weddingTime: '农历四月廿二 12:00',
+        weddingAddress: '婚贝大酒店A栋9F',
+        declaration: '遇见你，是我最美的意外',
+        declaration2: '我们决定携手共赴爱之新途',
+        quote1: '诚挚邀请最挚爱的亲友',
+        quote2: '来一场关于爱的旅行',
+        quote3: '见证我们爱的启程',
+        poemTitle: '不早不晚',
+        poemLine1: '当我拥你入怀',
+        poemLine2: '我便拥有了一切',
+        poemLine3: '沙子，时间，雨树',
+        poemLine4: '万物生机勃勃',
+        poemLine5: '在你的生命中我看到一切生命',
+        loveDefinition1: '爱，让我和你，变成了我们',
+        loveDefinition2: '让所有的「今天」',
+        loveDefinition3: '变成了「最好的一天」',
+        loveDefinition4: '我们有的是以后',
+        softQuote1: '你不是爱情的终点',
+        softQuote2: '只是爱情的原动力',
+        softQuote3: '我将这爱情献给路旁的花朵',
+        softQuote4: '献给教堂的红色圆顶',
+        softQuote5: '因为你，我爱上了这个世界',
+        countdownText1: '你说最好的人会到身边',
+        countdownText2: '此刻我也这样想',
+        days: '127',
+        hours: '8',
+        minutes: '24',
+        seconds: '36',
+        welcomeTitle: '欢迎',
+        welcomeSubtitle: '我们的婚礼',
+        welcomeLine1: '本着结婚对于我们来说是',
+        welcomeLine2: '开心和重要的事儿',
+        welcomeLine3: '希望各位朋友能够一起见证',
+        welcomeLine4: '这份开心',
+        placeName: '山里·山涧溪谷',
+        placeTag1: '凤凰山',
+        placeTag2: '涵碧楼酒店',
+        navAddress: '凤凰山风景区',
+        gentleWord1: '漫长人生零零碎碎',
+        gentleWord2: '普通又温暖',
+        gentleWord3: '我用最浪漫的方式登场',
+        rsvpTitle: '婚礼回执',
+        namePlaceholder: '请输入您的姓名',
+        defaultGuests: '1',
+        rsvpButton: '发送',
+        giftWord1: '生命中有有的人',
+        giftWord2: '是像礼物一般的存在',
+        giftWord3: '是一想到就觉得',
+        giftWord4: '心底忽而亮堂',
+        giftLine1: '而你，于我而言',
+        giftLine2: '便是这样的存在',
+        giftTitle: '祝福礼物',
+        giftNote1: '礼物金额实时转入',
+        giftNote2: '制作人婚贝账户',
+        actionName1: '祝福留言',
+        actionName2: '烟火贺喜',
+        actionName3: '永结同心',
+        statNumber: '99',
+        statLabel: '祝福留言 · 烟火贺喜 · 永结同心',
+        infoText: '9图 | 20.07w人喜欢'
+    };
+}
+
     
             // 格式化日期
             function formatDate(date) {
@@ -5641,87 +5679,122 @@ function showAllBlessings() {
     
             // 初始化页面
             function initPage() {
-                const urlParams = getUrlParams();
+    const urlParams = getUrlParams();
+    console.log('URL参数:', urlParams);
+    
+    if (urlParams.data) {
+        try {
+            const workData = JSON.parse(urlParams.data);
+            console.log('原始作品数据:', workData);
+            currentWorkData = workData;
+            
+            if (workData.userId) {
+                localStorage.setItem('userId', workData.userId);
+                console.log('从作品数据获取到userId:', workData.userId);
                 
-                if (urlParams.data) {
-                    try {
-                        const workData = JSON.parse(urlParams.data);
-                        currentWorkData = workData;
-                        
-                        if (workData.userId) {
-                            localStorage.setItem('userId', workData.userId);
-                            console.log('从作品数据获取到userId:', workData.userId);
-                            
-                            const userInfo = {
-                                id: workData.userId,
-                                groomName: workData.groomName || '',
-                                brideName: workData.brideName || ''
-                            };
-                            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                        }
-                        
-                        // 确保有 templateId（仅用于显示）
-                        if (!workData.templateId) {
-                            workData.templateId = 1;
-                        }
-                        
-                        // 确保有 invitationId
-                        if (!workData.invitationId && urlParams.invitationId) {
-                            workData.invitationId = parseInt(urlParams.invitationId);
-                        }
-                        
-                        currentTemplateId = workData.templateId;
-                        
-                    } catch (e) {
-                        console.error('解析作品数据失败:', e);
-                        currentWorkData = parseWorkData();
-                    }
-                } else {
-                    currentWorkData = parseWorkData();
-                }
-                
-                if (urlParams.userId && !localStorage.getItem('userId')) {
-                    localStorage.setItem('userId', urlParams.userId);
-                    console.log('从URL参数获取到userId:', urlParams.userId);
-                }
-                
-                const templateId = currentWorkData.templateId || 1;
-                
-                // 正确获取 invitationId
-                currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
-                currentTemplateId = templateId;
-                
-                console.log('初始化完成 - 邀请函ID:', currentInvitationId, '模板ID(仅用于显示):', currentTemplateId);
-                
-                let html = '';
-                switch(templateId) {
-                    case 1:
-                        html = renderGardenTemplate(currentWorkData);
-                        break;
-                    case 2:
-                        html = renderModernTemplate(currentWorkData);
-                        break;
-                    case 3:
-                        html = renderChineseTemplate(currentWorkData);
-                        break;
-                    case 4:
-                        html = renderIslandTemplate(currentWorkData);
-                        break;
-                    default:
-                        html = renderGardenTemplate(currentWorkData);
-                }
-                
-                document.getElementById('template-container').innerHTML = html;
-                document.title = getTemplateName(templateId) + '邀请函';
-                
-                guestCount = parseInt(currentWorkData.defaultGuests) || 1;
-                modernGuestCount = parseInt(currentWorkData.defaultGuests2) || 2;
-                chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
-                islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
-                
-                // 加载对应模板的祝福数据
-                loadBlessings();
+                const userInfo = {
+                    id: workData.userId,
+                    groomName: workData.groomName || '',
+                    brideName: workData.brideName || ''
+                };
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
             }
+            
+            // 确保有 templateId（仅用于显示）
+            if (!workData.templateId) {
+                workData.templateId = 1;
+            }
+            
+            // 关键修复：正确获取 invitationId
+            // 优先使用 workData.invitationId
+            if (workData.invitationId) {
+                currentInvitationId = parseInt(workData.invitationId);
+                console.log('从workData.invitationId设置邀请函ID:', currentInvitationId);
+            } 
+            // 其次使用 workData.id
+            else if (workData.id) {
+                currentInvitationId = parseInt(workData.id);
+                console.log('从workData.id设置邀请函ID:', currentInvitationId);
+                // 同时设置到 workData 中，方便后续使用
+                workData.invitationId = currentInvitationId;
+            }
+            // 最后从URL参数获取
+            else if (urlParams.invitationId) {
+                currentInvitationId = parseInt(urlParams.invitationId);
+                console.log('从URL参数设置邀请函ID:', currentInvitationId);
+                workData.invitationId = currentInvitationId;
+            }
+            // 默认值
+            else {
+                currentInvitationId = 1;
+                console.log('使用默认邀请函ID: 1');
+                workData.invitationId = 1;
+            }
+            
+            currentTemplateId = workData.templateId;
+            
+        } catch (e) {
+            console.error('解析作品数据失败:', e);
+            currentWorkData = parseWorkData();
+            // 确保从解析后的数据获取邀请函ID
+            if (currentWorkData.invitationId) {
+                currentInvitationId = parseInt(currentWorkData.invitationId);
+            }
+        }
+    } else {
+        currentWorkData = parseWorkData();
+        // 确保从解析后的数据获取邀请函ID
+        if (currentWorkData.invitationId) {
+            currentInvitationId = parseInt(currentWorkData.invitationId);
+        }
+    }
+    
+    if (urlParams.userId && !localStorage.getItem('userId')) {
+        localStorage.setItem('userId', urlParams.userId);
+        console.log('从URL参数获取到userId:', urlParams.userId);
+    }
+    
+    const templateId = currentWorkData.templateId || 1;
+    
+    // 再次确认邀请函ID
+    if (!currentInvitationId) {
+        currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
+    }
+    
+    currentTemplateId = templateId;
+    
+    console.log('初始化完成 - 邀请函ID:', currentInvitationId, '模板ID(仅用于显示):', currentTemplateId);
+    console.log('当前作品数据:', currentWorkData);
+    
+    let html = '';
+    switch(templateId) {
+        case 1:
+            html = renderGardenTemplate(currentWorkData);
+            break;
+        case 2:
+            html = renderModernTemplate(currentWorkData);
+            break;
+        case 3:
+            html = renderChineseTemplate(currentWorkData);
+            break;
+        case 4:
+            html = renderIslandTemplate(currentWorkData);
+            break;
+        default:
+            html = renderGardenTemplate(currentWorkData);
+    }
+    
+    document.getElementById('template-container').innerHTML = html;
+    document.title = getTemplateName(templateId) + '邀请函';
+    
+    guestCount = parseInt(currentWorkData.defaultGuests) || 1;
+    modernGuestCount = parseInt(currentWorkData.defaultGuests2) || 2;
+    chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
+    islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
+    
+    // 加载对应模板的祝福数据
+    loadBlessings();
+}
     
             // 导航到地点
             function navigateToLocation(address) {
