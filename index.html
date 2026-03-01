@@ -3698,93 +3698,239 @@
 			    checkUserStorage();
 			});
     
-            // 渲染祝福墙
-            function renderBlessings() {
-                const blessingList = document.getElementById('blessingList');
-                const countElement = document.getElementById('blessingCount');
+            // 修改渲染祝福墙函数 - 修复数据展示问题
+function renderBlessings() {
+    const blessingList = document.getElementById('blessingList');
+    const countElement = document.getElementById('blessingCount');
+    
+    if (!blessingList) {
+        console.log('祝福墙元素不存在');
+        return;
+    }
+    
+    console.log('渲染祝福数据:', blessings);
+    
+    // 获取当前模板名称并更新标题
+    const templateName = getTemplateName(currentWorkData?.templateId || 1);
+    const blessingTitle = document.querySelector('.blessing-title');
+    if (blessingTitle) {
+        blessingTitle.textContent = `✨ ${templateName} · 祝 福 墙 ✨`;
+    }
+    
+    if (!blessings || blessings.length === 0) {
+        blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
+        if (countElement) countElement.textContent = '0条祝福';
+        return;
+    }
+    
+    // 检查数据格式 - 根据后端返回的结构
+    let blessingArray = [];
+    if (blessings.rows) {
+        // 后端返回的是分页格式 {total: 22, rows: [...]}
+        blessingArray = blessings.rows;
+    } else if (Array.isArray(blessings)) {
+        blessingArray = blessings;
+    } else {
+        console.error('未知的祝福数据格式:', blessings);
+        blessingList.innerHTML = '<div class="empty-blessings">数据格式错误</div>';
+        return;
+    }
+    
+    console.log('处理后的祝福数组:', blessingArray);
+    
+    // 分离主祝福和回复
+    const mainBlessings = blessingArray.filter(b => !b.parentId);
+    const replies = blessingArray.filter(b => b.parentId);
+    
+    console.log('主祝福:', mainBlessings.length, '回复:', replies.length);
+    
+    // 按创建时间排序主祝福
+    mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+    
+    // 只显示最新的5条
+    const recentBlessings = mainBlessings.slice(0, 5);
+    
+    let html = '';
+    recentBlessings.forEach(blessing => {
+        const plainContent = removeHtmlTags(blessing.content || '');
+        const avatarBg = getAvatarColor(blessing.relation);
+        const avatarText = getAvatarText(blessing.guestName);
+        
+        const blessingReplies = replies.filter(r => r.parentId === blessing.id)
+            .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
+        
+        html += `
+            <div class="blessing-item" id="blessing-${blessing.id}">
+                <div class="blessing-item-header">
+                    <div class="blessing-avatar" style="background: ${avatarBg}">${avatarText}</div>
+                    <div class="blessing-user-info">
+                        <span class="blessing-name">${escapeHtml(blessing.guestName || '匿名')}</span>
+                        <span class="blessing-time">${formatTime(blessing.createTime)}</span>
+                    </div>
+                </div>
+                <div class="blessing-content">${escapeHtml(plainContent || '')}</div>
+                ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
                 
-                if (!blessingList) return;
-                
-                // 获取当前模板名称并更新标题（仅用于显示）
-                const templateName = getTemplateName(currentWorkData?.templateId || 1);
-                const blessingTitle = document.querySelector('.blessing-title');
-                if (blessingTitle) {
-                    blessingTitle.textContent = `✨ ${templateName} · 祝 福 墙 ✨`;
-                }
-                
-                if (!blessings || blessings.length === 0) {
-                    blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
-                    if (countElement) countElement.textContent = '0条祝福';
-                    return;
-                }
-                
-                // 分离主祝福和回复
-                const mainBlessings = blessings.filter(b => !b.parentId);
-                const replies = blessings.filter(b => b.parentId);
-                
-                // 按创建时间排序主祝福
-                mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
-                
-                // 只显示最新的5条
-                const recentBlessings = mainBlessings.slice(0, 5);
-                
-                let html = '';
-                recentBlessings.forEach(blessing => {
-                    const plainContent = removeHtmlTags(blessing.content);
-                    const avatarBg = getAvatarColor(blessing.relation);
-                    const avatarText = getAvatarText(blessing.guestName);
+                <div class="reply-section">
+                    <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName || '匿名')}')">
+                        💬 回复
+                    </button>
                     
-                    const blessingReplies = replies.filter(r => r.parentId === blessing.id)
-                        .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
-                    
-                    html += `
-                        <div class="blessing-item" id="blessing-${blessing.id}">
-                            <div class="blessing-item-header">
-                                <div class="blessing-avatar" style="background: ${avatarBg}">${avatarText}</div>
-                                <div class="blessing-user-info">
-                                    <span class="blessing-name">${escapeHtml(blessing.guestName)}</span>
-                                    <span class="blessing-time">${formatTime(blessing.createTime)}</span>
-                                </div>
-                            </div>
-                            <div class="blessing-content">${escapeHtml(plainContent)}</div>
-                            ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
-                            
-                            <div class="reply-section">
-                                <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName)}')">
-                                    💬 回复
-                                </button>
-                                
-                                ${blessingReplies.length > 0 ? `
-                                    <div class="reply-list">
-                                        ${blessingReplies.map(reply => {
-                                            const replyPlainContent = removeHtmlTags(reply.content);
-                                            const replyAvatarBg = getAvatarColor(reply.relation);
-                                            const replyAvatarText = getAvatarText(reply.guestName);
-                                            return `
-                                                <div class="reply-item">
-                                                    <div class="reply-header">
-                                                        <div class="reply-avatar" style="background: ${replyAvatarBg}">${replyAvatarText}</div>
-                                                        <span class="reply-name">${escapeHtml(reply.guestName)}</span>
-                                                        <span class="reply-time">${formatTime(reply.createTime)}</span>
-                                                    </div>
-                                                    <div class="reply-content">${escapeHtml(replyPlainContent)}</div>
-                                                </div>
-                                            `;
-                                        }).join('')}
+                    ${blessingReplies.length > 0 ? `
+                        <div class="reply-list">
+                            ${blessingReplies.map(reply => {
+                                const replyPlainContent = removeHtmlTags(reply.content || '');
+                                const replyAvatarBg = getAvatarColor(reply.relation);
+                                const replyAvatarText = getAvatarText(reply.guestName);
+                                return `
+                                    <div class="reply-item">
+                                        <div class="reply-header">
+                                            <div class="reply-avatar" style="background: ${replyAvatarBg}">${replyAvatarText}</div>
+                                            <span class="reply-name">${escapeHtml(reply.guestName || '匿名')}</span>
+                                            <span class="reply-time">${formatTime(reply.createTime)}</span>
+                                        </div>
+                                        <div class="reply-content">${escapeHtml(replyPlainContent)}</div>
                                     </div>
-                                ` : ''}
-                            </div>
+                                `;
+                            }).join('')}
                         </div>
-                    `;
-                });
-                
-                if (mainBlessings.length > 5) {
-                    html += `<div class="view-more" onclick="showAllBlessings()">查看更多祝福 (共${mainBlessings.length}条)...</div>`;
-                }
-                
-                blessingList.innerHTML = html;
-                if (countElement) countElement.textContent = `${blessings.length}条祝福`;
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    if (mainBlessings.length > 5) {
+        html += `<div class="view-more" onclick="showAllBlessings()">查看更多祝福 (共${mainBlessings.length}条)...</div>`;
+    }
+    
+    blessingList.innerHTML = html;
+    if (countElement) countElement.textContent = `${blessingArray.length}条祝福`;
+}
+
+// 修改加载祝福数据函数
+function loadBlessings() {
+    // 获取模板ID（仅用于显示）
+    currentTemplateId = currentWorkData?.templateId || 1;
+    
+    // 确保获取正确的邀请函ID
+    let invitationId = currentWorkData?.invitationId;
+    
+    // 如果workData中没有，尝试从URL参数获取
+    if (!invitationId) {
+        const urlParams = getUrlParams();
+        invitationId = urlParams.invitationId;
+    }
+    
+    // 如果还是没有，使用默认值
+    if (!invitationId) {
+        invitationId = currentInvitationId || 1;
+    }
+    
+    // 保存到全局变量
+    currentInvitationId = invitationId;
+    
+    console.log('加载祝福 - 邀请函ID:', invitationId);
+    
+    // 调用后端API获取祝福列表
+    fetch(`${API_BASE_URL}/wall/wall/public/list?invitationId=${invitationId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('加载祝福响应:', data);
+            if (data.code === 200) {
+                // 保存完整响应数据
+                blessings = data;
+                renderBlessings();
+            } else {
+                console.error('加载祝福失败:', data.msg);
+                blessings = [];
+                renderBlessings();
             }
+        })
+        .catch(error => {
+            console.error('API调用失败:', error);
+            showToast('加载祝福失败，请稍后重试');
+            blessings = [];
+            renderBlessings();
+        });
+}
+
+// 修改显示所有祝福函数
+function showAllBlessings() {
+    const blessingList = document.getElementById('blessingList');
+    const countElement = document.getElementById('blessingCount');
+    
+    // 检查数据格式
+    let blessingArray = [];
+    if (blessings.rows) {
+        blessingArray = blessings.rows;
+    } else if (Array.isArray(blessings)) {
+        blessingArray = blessings;
+    } else {
+        console.error('未知的祝福数据格式:', blessings);
+        return;
+    }
+    
+    const mainBlessings = blessingArray.filter(b => !b.parentId);
+    const replies = blessingArray.filter(b => b.parentId);
+    
+    mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+    
+    let html = '';
+    mainBlessings.forEach(blessing => {
+        const plainContent = removeHtmlTags(blessing.content || '');
+        const avatarBg = getAvatarColor(blessing.relation);
+        const avatarText = getAvatarText(blessing.guestName);
+        
+        const blessingReplies = replies.filter(r => r.parentId === blessing.id)
+            .sort((a, b) => new Date(a.createTime) - new Date(b.createTime));
+        
+        html += `
+            <div class="blessing-item" id="blessing-${blessing.id}">
+                <div class="blessing-item-header">
+                    <div class="blessing-avatar" style="background: ${avatarBg}">${avatarText}</div>
+                    <div class="blessing-user-info">
+                        <span class="blessing-name">${escapeHtml(blessing.guestName || '匿名')}</span>
+                        <span class="blessing-time">${formatTime(blessing.createTime)}</span>
+                    </div>
+                </div>
+                <div class="blessing-content">${escapeHtml(plainContent || '')}</div>
+                ${blessing.relation ? `<div class="blessing-relation">${escapeHtml(blessing.relation)}</div>` : ''}
+                
+                <div class="reply-section">
+                    <button class="reply-btn" onclick="showReplyForm(${blessing.id}, '${escapeHtml(blessing.guestName || '匿名')}')">
+                        💬 回复
+                    </button>
+                    
+                    ${blessingReplies.length > 0 ? `
+                        <div class="reply-list">
+                            ${blessingReplies.map(reply => {
+                                const replyPlainContent = removeHtmlTags(reply.content || '');
+                                const replyAvatarBg = getAvatarColor(reply.relation);
+                                const replyAvatarText = getAvatarText(reply.guestName);
+                                return `
+                                    <div class="reply-item">
+                                        <div class="reply-header">
+                                            <div class="reply-avatar" style="background: ${replyAvatarBg}">${replyAvatarText}</div>
+                                            <span class="reply-name">${escapeHtml(reply.guestName || '匿名')}</span>
+                                            <span class="reply-time">${formatTime(reply.createTime)}</span>
+                                        </div>
+                                        <div class="reply-content">${escapeHtml(replyPlainContent)}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `<div class="back-btn" onclick="loadBlessings()">← 返回最新</div>`;
+    
+    blessingList.innerHTML = html;
+    if (countElement) countElement.textContent = `${blessingArray.length}条祝福`;
+}
     
             // 显示所有祝福
             function showAllBlessings() {
