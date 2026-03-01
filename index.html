@@ -3401,19 +3401,20 @@
     </div>
 
     <script>
-            // ===== 完整祝福墙功能（所有模板通用，支持模板ID识别） =====
+            // ===== 完整祝福墙功能（所有模板通用） =====
             let blessings = [];
             let currentInvitationId = null;
-            let currentTemplateId = 1; // 默认模板ID
+			let currentTemplateId = null; // 新增：当前模板ID
 			const API_BASE_URL = 'http://localhost:8080';
     
-            // 从后端加载祝福数据（按模板ID）
+            // 从后端加载祝福数据
             function loadBlessings() {
-                // 获取当前模板ID
+                // 获取当前邀请函ID和模板ID
+                currentInvitationId = currentWorkData?.invitationId || 1;
                 currentTemplateId = currentWorkData?.templateId || 1;
                 
-                // 调用后端API获取祝福列表（按模板ID）
-                fetch(`${API_BASE_URL}/wall/wall/public/template/${currentTemplateId}`)
+                // 调用后端API获取祝福列表，传递模板ID参数
+                fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}?templateId=${currentTemplateId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.code === 200) {
@@ -3434,6 +3435,7 @@
             }
     
             // 保存祝福数据到后端
+            // 保存祝福数据到后端（包含模板ID）
             function saveBlessing(blessing) {
                 const token = localStorage.getItem('token');
                 const headers = {
@@ -3443,12 +3445,8 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保包含 templateId
-                if (!blessing.templateId && currentWorkData) {
-                    blessing.templateId = currentWorkData.templateId || 1;
-                }
-                
-                console.log('发送祝福数据:', blessing);
+                // 确保祝福对象包含模板ID
+                blessing.templateId = currentTemplateId;
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/add`, {
                     method: 'POST',
@@ -3457,7 +3455,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('响应数据:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
@@ -3476,10 +3473,8 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保包含 templateId
-                if (!replyData.templateId && currentWorkData) {
-                    replyData.templateId = currentWorkData.templateId || 1;
-                }
+                // 确保回复数据包含模板ID
+                replyData.templateId = currentTemplateId;
                 
                 return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
                     method: 'POST',
@@ -3516,12 +3511,9 @@
                     }
                 }
                 
-                // 获取当前模板ID
-                const templateId = currentWorkData?.templateId || 1;
-                
                 const newBlessing = {
                     invitationId: currentInvitationId || 1,
-                    templateId: templateId, // 关键：添加模板ID
+                    templateId: currentTemplateId, // 添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3529,8 +3521,6 @@
                     isPublic: 1,
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
-                
-                console.log('提交的祝福数据:', newBlessing);
                 
                 showToast('正在发送祝福...');
                 
@@ -3563,12 +3553,9 @@
                     }
                 }
                 
-                // 获取当前模板ID
-                const templateId = currentWorkData?.templateId || 1;
-                
                 const replyData = {
                     invitationId: currentInvitationId,
-                    templateId: templateId, // 关键：添加模板ID
+                    templateId: currentTemplateId, // 添加模板ID
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3576,8 +3563,6 @@
                     isPublic: 1,
                     avatar: 'https://www.gravatar.com/avatar/default?d=mp'
                 };
-                
-                console.log('发送回复数据:', replyData);
                 
                 showToast('正在发送回复...');
                 
@@ -3623,13 +3608,6 @@
                 const countElement = document.getElementById('blessingCount');
                 
                 if (!blessingList) return;
-                
-                // 获取当前模板名称并更新标题
-                const templateName = getTemplateName(currentWorkData?.templateId || 1);
-                const blessingTitle = document.querySelector('.blessing-title');
-                if (blessingTitle) {
-                    blessingTitle.textContent = `✨ ${templateName} · 祝 福 墙 ✨`;
-                }
                 
                 if (blessings.length === 0) {
                     blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
@@ -3932,11 +3910,6 @@
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
                         
-                        // 确保有 templateId
-                        if (!workData.templateId) {
-                            workData.templateId = 1;
-                        }
-                        
                         return workData;
                     } catch (e) {
                         console.error('解析作品数据失败:', e);
@@ -3952,7 +3925,6 @@
                     }
                 }
                 
-                // 返回默认数据，包含 templateId
                 return {
                     templateId: 1,
                     invitationId: 1,
@@ -4467,7 +4439,7 @@
                             </div>
                         </div>
     					
-    					<!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+    					<!-- 祝福墙区域 - 所有模板都有 -->
     					${getBlessingWallHTML()}
                     </div>
                 `;
@@ -4822,7 +4794,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 - 所有模板都有 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5108,7 +5080,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 - 所有模板都有 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5388,7 +5360,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 - 所有模板都有 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5425,13 +5397,6 @@
                             };
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
-                        
-                        // 确保有 templateId
-                        if (!workData.templateId) {
-                            workData.templateId = 1;
-                        }
-                        currentTemplateId = workData.templateId;
-                        
                     } catch (e) {
                         console.error('解析作品数据失败:', e);
                         currentWorkData = parseWorkData();
@@ -5447,7 +5412,6 @@
                 
                 const templateId = currentWorkData.templateId || 1;
                 currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
-                currentTemplateId = templateId;
                 
                 let html = '';
                 switch(templateId) {
@@ -5475,7 +5439,6 @@
                 chineseGuestCount = parseInt(currentWorkData.defaultGuestsChinese) || 2;
                 islandGuestCount = parseInt(currentWorkData.defaultGuestsIsland) || 2;
                 
-                // 加载对应模板的祝福数据
                 loadBlessings();
             }
     
