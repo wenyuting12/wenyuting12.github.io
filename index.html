@@ -3413,20 +3413,13 @@
                 currentInvitationId = currentWorkData?.invitationId || 1;
                 currentTemplateId = currentWorkData?.templateId || 1;
                 
-                console.log('加载祝福 - 当前模板ID:', currentTemplateId, '邀请函ID:', currentInvitationId);
-                
-                // 调用后端API获取祝福列表 - 使用标准的查询参数格式
-                fetch(`${API_BASE_URL}/wall/wall/public/list?invitationId=${currentInvitationId}&templateId=${currentTemplateId}`)
+                // 调用后端API获取祝福列表（按模板ID过滤）
+                fetch(`${API_BASE_URL}/wall/wall/public/invitation/${currentInvitationId}?templateId=${currentTemplateId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('祝福数据返回:', data);
                         if (data.code === 200) {
                             // 前端也做一层过滤，确保只显示当前模板的祝福
-                            blessings = (data.data || []).filter(b => {
-                                // 检查模板ID是否匹配（支持字符串和数字）
-                                return b.templateId == currentTemplateId;
-                            });
-                            console.log('过滤后的祝福数量:', blessings.length);
+                            blessings = (data.data || []).filter(b => b.templateId == currentTemplateId);
                             renderBlessings();
                         } else {
                             console.error('加载祝福失败:', data.msg);
@@ -3455,8 +3448,6 @@
                 // 确保祝福数据中包含模板ID
                 blessing.templateId = currentTemplateId;
                 
-                console.log('保存祝福 - 模板ID:', currentTemplateId, '数据:', blessing);
-                
                 return fetch(`${API_BASE_URL}/wall/wall/public/add`, {
                     method: 'POST',
                     headers: headers,
@@ -3464,7 +3455,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('保存祝福响应:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
@@ -3486,8 +3476,6 @@
                 // 确保回复数据中包含模板ID
                 replyData.templateId = currentTemplateId;
                 
-                console.log('保存回复 - 模板ID:', currentTemplateId, '父ID:', parentId, '数据:', replyData);
-                
                 return fetch(`${API_BASE_URL}/wall/wall/public/reply/${parentId}`, {
                     method: 'POST',
                     headers: headers,
@@ -3495,7 +3483,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('保存回复响应:', data);
                     if (data.code === 200) {
                         return data.data;
                     } else {
@@ -3622,26 +3609,15 @@
                 
                 if (!blessingList) return;
                 
-                console.log('渲染祝福墙 - 当前模板ID:', currentTemplateId, '祝福数量:', blessings.length);
-                
                 if (blessings.length === 0) {
                     blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
                     if (countElement) countElement.textContent = '0条祝福';
                     return;
                 }
                 
-                // 再次确认过滤
-                const filteredBlessings = blessings.filter(b => b.templateId == currentTemplateId);
-                if (filteredBlessings.length !== blessings.length) {
-                    console.warn('发现不属于当前模板的祝福，重新过滤');
-                    blessings = filteredBlessings;
-                }
-                
                 // 分离主祝福和回复
                 const mainBlessings = blessings.filter(b => !b.parentId);
                 const replies = blessings.filter(b => b.parentId);
-                
-                console.log('主祝福数量:', mainBlessings.length, '回复数量:', replies.length);
                 
                 // 按创建时间排序主祝福
                 mainBlessings.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
@@ -3711,15 +3687,6 @@
             function showAllBlessings() {
                 const blessingList = document.getElementById('blessingList');
                 const countElement = document.getElementById('blessingCount');
-                
-                console.log('显示所有祝福 - 当前模板ID:', currentTemplateId);
-                
-                // 再次确认过滤
-                const filteredBlessings = blessings.filter(b => b.templateId == currentTemplateId);
-                if (filteredBlessings.length !== blessings.length) {
-                    console.warn('发现不属于当前模板的祝福，重新过滤');
-                    blessings = filteredBlessings;
-                }
                 
                 const mainBlessings = blessings.filter(b => !b.parentId);
                 const replies = blessings.filter(b => b.parentId);
@@ -5446,8 +5413,6 @@
                 const templateId = currentWorkData.templateId || 1;
                 currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
                 currentTemplateId = templateId; // 保存当前模板ID
-                
-                console.log('初始化 - 模板ID:', currentTemplateId, '邀请函ID:', currentInvitationId);
                 
                 let html = '';
                 switch(templateId) {
