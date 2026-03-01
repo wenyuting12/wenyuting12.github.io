@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>婚礼邀请函</title>
     <style>
-        /* 全局样式 */
+        /* 全局样式 - 保持不变，省略以节省空间，实际使用时保留所有样式 */
         * {
             margin: 0;
             padding: 0;
@@ -3401,18 +3401,18 @@
     </div>
 
     <script>
-            // ===== 完整祝福墙功能（所有模板通用，支持模板ID识别） =====
+            // ===== 完整祝福墙功能（移除所有templateId相关代码） =====
             let blessings = [];
             let currentInvitationId = null;
-            let currentTemplateId = 1; // 默认模板ID
+            let currentTemplateId = 1; // 仅用于显示，不发送给后端
 			const API_BASE_URL = 'http://localhost:8080';
     
-            // 从后端加载祝福数据（按模板ID和邀请函ID）
+            // 从后端加载祝福数据（只按邀请函ID查询）
             function loadBlessings() {
-                // 获取当前模板ID
+                // 获取模板ID（仅用于显示）
                 currentTemplateId = currentWorkData?.templateId || 1;
                 
-                // 确保获取正确的邀请函ID - 修复：从多个来源获取invitationId
+                // 确保获取正确的邀请函ID
                 let invitationId = currentWorkData?.invitationId;
                 
                 // 如果workData中没有，尝试从URL参数获取
@@ -3426,15 +3426,17 @@
                     invitationId = currentInvitationId || 1;
                 }
                 
-                // 保存到全局变量，供其他地方使用
+                // 保存到全局变量
                 currentInvitationId = invitationId;
                 
-                console.log('加载祝福 - 邀请函ID:', invitationId, '模板ID:', currentTemplateId);
+                console.log('加载祝福 - 邀请函ID:', invitationId);
                 
-                // 调用后端API获取祝福列表（按模板ID和邀请函ID）
-                fetch(`${API_BASE_URL}/wall/wall/public/template/${currentTemplateId}?invitationId=${invitationId}`)
+                // 调用后端API获取祝福列表（只按邀请函ID查询）
+                // 注意：后端实体类没有templateId字段，所以不传递
+                fetch(`${API_BASE_URL}/wall/wall/public/list?invitationId=${invitationId}`)
                     .then(response => response.json())
                     .then(data => {
+                        console.log('加载祝福响应:', data);
                         if (data.code === 200) {
                             blessings = data.data || [];
                             renderBlessings();
@@ -3462,12 +3464,7 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保包含 templateId 和 invitationId
-                if (!blessing.templateId && currentWorkData) {
-                    blessing.templateId = currentWorkData.templateId || 1;
-                }
-                
-                // 确保 invitationId 正确 - 修复：使用当前有效的邀请函ID
+                // 确保 invitationId 正确 - 移除所有templateId相关代码
                 if (!blessing.invitationId) {
                     // 从多个来源获取 invitationId
                     let invitationId = currentWorkData?.invitationId || currentInvitationId;
@@ -3483,7 +3480,7 @@
                         invitationId = 1;
                     }
                     
-                    blessing.invitationId = invitationId;
+                    blessing.invitationId = parseInt(invitationId); // 确保是数字类型
                     
                     // 更新全局变量
                     currentInvitationId = invitationId;
@@ -3517,12 +3514,7 @@
                     headers['Authorization'] = token;
                 }
                 
-                // 确保包含 templateId 和 invitationId
-                if (!replyData.templateId && currentWorkData) {
-                    replyData.templateId = currentWorkData.templateId || 1;
-                }
-                
-                // 确保 invitationId 正确 - 修复：使用当前有效的邀请函ID
+                // 确保 invitationId 正确 - 移除所有templateId相关代码
                 if (!replyData.invitationId) {
                     // 从多个来源获取 invitationId
                     let invitationId = currentWorkData?.invitationId || currentInvitationId;
@@ -3538,7 +3530,7 @@
                         invitationId = 1;
                     }
                     
-                    replyData.invitationId = invitationId;
+                    replyData.invitationId = parseInt(invitationId); // 确保是数字类型
                     
                     // 更新全局变量
                     currentInvitationId = invitationId;
@@ -3579,9 +3571,6 @@
                     }
                 }
                 
-                // 获取当前模板ID
-                const templateId = currentWorkData?.templateId || 1;
-                
                 // 获取邀请函ID - 修复：从多个来源获取
                 let invitationId = currentWorkData?.invitationId || currentInvitationId;
                 
@@ -3600,8 +3589,7 @@
                 currentInvitationId = invitationId;
                 
                 const newBlessing = {
-                    invitationId: invitationId,
-                    templateId: templateId, // 关键：添加模板ID
+                    invitationId: parseInt(invitationId), // 确保是数字类型
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3643,9 +3631,6 @@
                     }
                 }
                 
-                // 获取当前模板ID
-                const templateId = currentWorkData?.templateId || 1;
-                
                 // 获取邀请函ID - 修复：从多个来源获取
                 let invitationId = currentWorkData?.invitationId || currentInvitationId;
                 
@@ -3664,8 +3649,7 @@
                 currentInvitationId = invitationId;
                 
                 const replyData = {
-                    invitationId: invitationId,
-                    templateId: templateId, // 关键：添加模板ID
+                    invitationId: parseInt(invitationId), // 确保是数字类型
                     userId: userId ? parseInt(userId) : null,
                     guestName: name,
                     content: content,
@@ -3721,14 +3705,14 @@
                 
                 if (!blessingList) return;
                 
-                // 获取当前模板名称并更新标题
+                // 获取当前模板名称并更新标题（仅用于显示）
                 const templateName = getTemplateName(currentWorkData?.templateId || 1);
                 const blessingTitle = document.querySelector('.blessing-title');
                 if (blessingTitle) {
                     blessingTitle.textContent = `✨ ${templateName} · 祝 福 墙 ✨`;
                 }
                 
-                if (blessings.length === 0) {
+                if (!blessings || blessings.length === 0) {
                     blessingList.innerHTML = '<div class="empty-blessings">还没有祝福，快来写下第一条祝福吧~</div>';
                     if (countElement) countElement.textContent = '0条祝福';
                     return;
@@ -4029,12 +4013,12 @@
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
                         
-                        // 确保有 templateId
+                        // 确保有 templateId（仅用于显示）
                         if (!workData.templateId) {
                             workData.templateId = 1;
                         }
                         
-                        // 确保有 invitationId - 修复：从URL参数获取或保留原有的
+                        // 确保有 invitationId
                         if (!workData.invitationId && params.invitationId) {
                             workData.invitationId = parseInt(params.invitationId);
                         }
@@ -4054,7 +4038,7 @@
                     }
                 }
                 
-                // 返回默认数据，包含 templateId 和 invitationId
+                // 返回默认数据，包含 invitationId
                 return {
                     templateId: 1,
                     invitationId: params.invitationId ? parseInt(params.invitationId) : 1,
@@ -4200,7 +4184,7 @@
                 `;
             }
     
-            // 生成温柔花园模板HTML
+            // 生成温柔花园模板HTML（保持不变，只移除了templateId相关代码）
             function renderGardenTemplate(data) {
                 return `
                     <div class="garden-invitation">
@@ -4569,13 +4553,13 @@
                             </div>
                         </div>
     					
-    					<!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+    					<!-- 祝福墙区域 -->
     					${getBlessingWallHTML()}
                     </div>
                 `;
             }
     
-            // 生成简约现代模板HTML
+            // 生成简约现代模板HTML（保持不变，只移除了templateId相关代码）
             function renderModernTemplate(data) {
                 return `
                     <div class="modern-invitation">
@@ -4924,14 +4908,15 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
             }
     
-            // 生成中式传统模板HTML
+            // 生成中式传统模板HTML（省略，保持原样但移除了templateId相关代码）
             function renderChineseTemplate(data) {
+                // 保持原样，只移除了所有templateId相关代码
                 return `
                     <div class="chinese-invitation">
                         <!-- 封面区 - 中国红背景 -->
@@ -5210,14 +5195,15 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
             }
     
-            // 生成海岛度假模板HTML
+            // 生成海岛度假模板HTML（省略，保持原样但移除了templateId相关代码）
             function renderIslandTemplate(data) {
+                // 保持原样，只移除了所有templateId相关代码
                 return `
                     <div class="island-invitation">
                         <!-- 封面区 -->
@@ -5490,7 +5476,7 @@
                             </div>
                         </div>
                         
-                        <!-- 祝福墙区域 - 所有模板都有，会自动识别当前模板ID -->
+                        <!-- 祝福墙区域 -->
                         ${getBlessingWallHTML()}
                     </div>
                 `;
@@ -5528,12 +5514,12 @@
                             localStorage.setItem('userInfo', JSON.stringify(userInfo));
                         }
                         
-                        // 确保有 templateId
+                        // 确保有 templateId（仅用于显示）
                         if (!workData.templateId) {
                             workData.templateId = 1;
                         }
                         
-                        // 确保有 invitationId - 修复：从URL参数获取或保留原有的
+                        // 确保有 invitationId
                         if (!workData.invitationId && urlParams.invitationId) {
                             workData.invitationId = parseInt(urlParams.invitationId);
                         }
@@ -5555,11 +5541,11 @@
                 
                 const templateId = currentWorkData.templateId || 1;
                 
-                // 修复：正确获取 invitationId
+                // 正确获取 invitationId
                 currentInvitationId = currentWorkData.invitationId || urlParams.invitationId || 1;
                 currentTemplateId = templateId;
                 
-                console.log('初始化完成 - 邀请函ID:', currentInvitationId, '模板ID:', currentTemplateId);
+                console.log('初始化完成 - 邀请函ID:', currentInvitationId, '模板ID(仅用于显示):', currentTemplateId);
                 
                 let html = '';
                 switch(templateId) {
